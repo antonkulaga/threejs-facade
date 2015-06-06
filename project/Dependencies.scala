@@ -5,8 +5,8 @@ import sbt._
 object Dependencies {
 
 	//libs for testing
-  lazy val testing = Def.setting(Seq(
-    "com.lihaoyi" %%% "utest" % Versions.utest % "test"
+  lazy val testing: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
+    //"com.lihaoyi" %%% "utest" % Versions.utest % "test"
   ))
 
 	//akka-related libs
@@ -16,9 +16,7 @@ object Dependencies {
 
 		"com.typesafe.akka" %% "akka-http-core-experimental" % Versions.akkaHttp,
 
-		"com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaHttp,
-
-		"com.typesafe.akka" %% "akka-http-testkit-experimental" % Versions.akkaHttp
+		"com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaHttp
 	))
 
 	lazy val templates = Def.setting(Seq(
@@ -51,9 +49,7 @@ object Dependencies {
 
 		"org.webjars" % "Semantic-UI" % Versions.semanticUI, //css theme, similar to bootstrap
 
-		"org.webjars" % "selectize.js" % Versions.selectize, //select control
-
-		"org.webjars" % "codemirror" % "5.3",
+		"org.webjars" % "codemirror" % Versions.codemirror,
 
 		"org.webjars" % "three.js" % Versions.threeJs
 	))

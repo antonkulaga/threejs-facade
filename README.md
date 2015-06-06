@@ -1,7 +1,9 @@
 threejs facade
 ==============
 
-This if a facade of threejs library. All the code is inside threejs subproject.
+This if a facade of threejs javascript 3D library ( http://threejs.org/ ). 
+All the code is inside facade folder (threejs subproject). 
+It also contains some extra classes for esier scence creation and css3d rendering.
 
 Usage
 =====
@@ -21,5 +23,5 @@ To run preview:
 ```sbt
     sbt //to opens sbt console
     re-start //Use this command **instead of** run to run the app
-    Open localhost:5552 to see the result, it should reload whenever any sources are changed
+    Open localhost:5552 to see the result
 ```

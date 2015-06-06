@@ -24,7 +24,6 @@ object Build extends PreviewBuild {
 
 class PreviewBuild extends FacadeBuild
 {
-
 	// code shared between backend and frontend
 	lazy val shared = crossProject
 	  .crossType(CrossType.Pure)
