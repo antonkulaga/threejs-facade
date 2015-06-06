@@ -1,0 +1,13 @@
+@(content:Option[Html] = None)
+<html>
+  <head title="Plasmids bank">
+    @html.libs()
+    @html.runner()
+  </head>
+  <body>
+      @html.sidebar()
+      <div  class="pusher"> <!--it will be pushed by a sidebar-->
+          @html.main(content)
+      </div>
+  </body>
+</html>
