@@ -9,7 +9,6 @@ trait IntersectionControls
   def camera:Camera
   def scene:Object3D
 
-  //val projector = new Projector()
   val raycaster = new Raycaster()
 
   var intersections = List.empty[Intersection]
@@ -18,14 +17,12 @@ trait IntersectionControls
   var exit = Map.empty[Object3D, List[Intersection]]
   var enter = Map.empty[Object3D, List[Intersection]]
 
-
   def findIntersections(x:Double,y:Double) =
   {
     val vector = new Vector3( x, y, 1 )
     raycaster.setFromCamera(vector, camera)
     raycaster.intersectObjects( scene.children ).sortWith( (a,b)=>a.point.distanceTo(vector)<b.point.distanceTo(vector)).toList
   }
-
 
   def onCursorMove(cordX:Double,cordY:Double,width:Double,height:Double) =
   {
@@ -40,7 +37,6 @@ trait IntersectionControls
     val s = enter.size
     last = underMouse
     if(s!=enter.size) dom.console.error("ScalaJS error with immutable collections")
-
   }
 
 }

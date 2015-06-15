@@ -11,7 +11,6 @@ import scala.scalajs.js
 class Scheduler
 {
   def current = js.Date.now
-
   var animations = List.empty[Animation]
 
   def add(ani:Animation) = {
@@ -37,8 +36,6 @@ class Scheduler
     start()
   }
 
-
-
   def start() =    {
     dom.requestAnimationFrame(  onEnterFrameFunction _ )
     this
@@ -48,7 +45,7 @@ class Scheduler
 }
 
 object Easings {
-  
+
   val linear:Double=>Double = i=>i
 
 }
@@ -62,16 +59,11 @@ object Animation{
     def start:Double
 
   }
-//  trait Active extends Started{
-//    def position:Double
-//  }
   case object Stopped extends AniState
   case class Finished(start:Double) extends Started
   case class Paused(start:Double) extends Started
   case class Running(start:Double) extends Started
   case class Backward(start:Double,finished:Double) extends Started
-  
-  //def apply(length:Duration,easing:Double=>Double = i=>i)(fun:(Double=>Unit)):Animation= new Animation(length,easing)(fun)
 
 }
 
@@ -104,11 +96,8 @@ class Animation(val length:Duration,easing:Double=>Double = Easings.linear)(fun:
     case _=> dom.console.error("trying to run an operation that has not started")
   }
 
-
   def go(implicit scheduler:Scheduler) = {
     scheduler.add(this)
   }
-
-
 
 }

@@ -12,13 +12,11 @@ import scala.scalajs.js.{Array, Dynamic}
 trait Container3D extends SceneContainer
 {
 
-
   container.style.width = width.toString
   container.style.height = height.toString
   container.style.position = "relative"
 
   override type RendererType =  WebGLRenderer
-
 
   protected def initRenderer= {
     val params = Dynamic.literal(
@@ -39,7 +37,6 @@ trait Container3D extends SceneContainer
 
   val cssRenderer:HtmlRenderer = this.initCSSRenderer
 
-
   protected def initCSSRenderer = {
     val rendererCSS = new HtmlRenderer()
     rendererCSS.setSize(width,height)
@@ -50,23 +47,16 @@ trait Container3D extends SceneContainer
     rendererCSS
   }
 
-
-  //val controls = new OrbitControls(camera,this.container)
   val controls:CameraControls = new HoverControls(camera,this.container)
-
 
   container.appendChild( renderer.domElement )
   container.appendChild( cssRenderer.domElement )
   //cssRenderer.domElement.appendChild( renderer.domElement )
 
-
-
   override def onEnterFrame() = {
     controls.update()
     renderer.render( scene, camera )
     cssRenderer.render( cssScene, camera )
-
   }
-
 
 }

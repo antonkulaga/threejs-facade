@@ -20,15 +20,11 @@ trait SceneContainer{
 
   lazy val renderer: RendererType = this.initRenderer()
 
-
   lazy val camera = initCamera()
-
 
   def aspectRatio = width /height
 
-
   protected def initRenderer():RendererType
-
 
   protected def initCamera() =
   {
@@ -36,8 +32,6 @@ trait SceneContainer{
     camera.position.z = distance
     camera
   }
-
-
 
   protected def onEnterFrameFunction(double: Double): Unit = {
     onEnterFrame()
@@ -48,10 +42,7 @@ trait SceneContainer{
       renderer.render(scene, camera)
   }
 
-
-
   def render() =  dom.requestAnimationFrame(  onEnterFrameFunction _ )
-
 
 }
 

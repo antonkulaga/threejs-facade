@@ -362,36 +362,21 @@ class Float64Attribute  extends BufferAttribute {
 }
 
 @JSName("THREE.BufferGeometry")
-class BufferGeometry extends js.Object {
-  var id: Double = js.native
-  var uuid: String = js.native
-  var name: String = js.native
+class BufferGeometry extends Geometry {
   var attributes: js.Array[BufferAttribute] = js.native
   var drawcalls: js.Any = js.native
   var offsets: js.Any = js.native
-  var boundingBox: BoundingBox3D = js.native
-  var boundingSphere: BoundingSphere = js.native
   def addAttribute(name: String, attribute: BufferAttribute): js.Dynamic = js.native
   def addAttribute(name: String, array: js.Any, itemSize: Double): js.Dynamic = js.native
   def getAttribute(name: String): js.Dynamic = js.native
   def addDrawCall(start: Double, count: Double, index: Double): Unit = js.native
-  def applyMatrix(matrix: Matrix4): Unit = js.native
   def fromGeometry(geometry: Geometry, settings: js.Any = js.native): BufferGeometry = js.native
-  def computeBoundingBox(): Unit = js.native
-  def computeBoundingSphere(): Unit = js.native
-  def computeFaceNormals(): Unit = js.native
   def computeVertexNormals(): Unit = js.native
-  def computeTangents(): Unit = js.native
   def computeOffsets(indexBufferSize: Double): Unit = js.native
   def merge(): Unit = js.native
   def normalizeNormals(): Unit = js.native
   def reorderBuffers(indexBuffer: Double, indexMap: js.Array[Double], vertexCount: Double): Unit = js.native
   override def clone(): BufferGeometry = js.native
-  def dispose(): Unit = js.native
-  def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def removeEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def dispatchEvent(event: js.Any): Unit = js.native
 }
 
 @JSName("THREE.Clock")
@@ -572,16 +557,6 @@ class Object3D extends js.Object {
 object Object3D extends js.Object {
   var DefaultUp: Vector3 = js.native
 }
-
-/*
-@JSName("THREE.Projector")
-class Projector extends js.Object {
-  def projectVector(vector: Vector3, camera: Camera): Vector3 = js.native
-  def unprojectVector(vector: Vector3, camera: Camera): Vector3 = js.native
-  def pickingRay(vector: Vector3, camera: Camera): Raycaster = js.native
-  def projectScene(scene: Scene, camera: Camera, sortObjects: Boolean, sortElements: Boolean = js.native): js.Any = js.native
-}
-*/
 
 trait Intersection extends js.Object {
   var distance: Double = js.native
