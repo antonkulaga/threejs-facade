@@ -10,7 +10,7 @@ import scala.scalajs.js.typedarray._
 trait WebGLRenderingContext extends js.Object {
 }
 
-package object THREE extends js.Object {
+object THREE extends js.Object {
   var REVISION: String = js.native
   var CullFaceNone: CullFace = js.native
   var CullFaceBack: CullFace = js.native
