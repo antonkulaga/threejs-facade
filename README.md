@@ -11,7 +11,7 @@ Usage
 In order to resolve a lib you should add a resolver::
 ```scala
 resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases") //add resolver
-libraryDependencies += "org.denigma" %%% "threejs-facade" % "0.0.71-0.1.5" //add dependency
+libraryDependencies += "org.denigma" %%% "threejs-facade" % "0.0.74-0.1.6" //add dependency
 ```
 
 Gettings started

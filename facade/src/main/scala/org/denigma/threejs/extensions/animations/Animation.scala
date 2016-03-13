@@ -37,7 +37,7 @@ class Scheduler
   }
 
   def start() =    {
-    dom.requestAnimationFrame(  onEnterFrameFunction _ )
+    dom.window.requestAnimationFrame(  onEnterFrameFunction _ )
     this
   }
 

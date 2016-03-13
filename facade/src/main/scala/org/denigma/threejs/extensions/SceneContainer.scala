@@ -42,7 +42,7 @@ trait SceneContainer{
       renderer.render(scene, camera)
   }
 
-  def render() =  dom.requestAnimationFrame(  onEnterFrameFunction _ )
+  def render() =  dom.window.requestAnimationFrame(  onEnterFrameFunction _ )
 
 }
 

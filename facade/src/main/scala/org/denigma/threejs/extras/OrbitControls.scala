@@ -10,10 +10,10 @@ import scala.scalajs.js.annotation.JSName
 
 
 @JSName("THREE.OrbitControls")
-class OrbitControls( camera:Camera, element:HTMLElement) extends js.Object
+class OrbitControls( camera: Camera, element: HTMLElement) extends js.Object
 {
 
-  def this(camera:Camera) = this(camera, null)
+  def this(camera: Camera) = this(camera, null)
 
   def rotateLeft(angle:Double):Unit = js.native
 

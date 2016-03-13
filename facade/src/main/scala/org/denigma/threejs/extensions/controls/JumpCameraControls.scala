@@ -19,9 +19,9 @@ import scala.language.postfixOps
  * @param height
  * @param center
  */
-class JumpCameraControls(val camera:Camera,
-                         val element:HTMLElement,
-                         val scene:Scene,
+class JumpCameraControls(val camera: Camera,
+                         val element: HTMLElement,
+                         val scene: Scene,
                           val width:Double, val height:Double,
                          center:Vector3 = new Vector3())
   extends HoverControls(camera,element,center) with IntersectionControls
@@ -49,7 +49,7 @@ class JumpCameraControls(val camera:Camera,
     //center.copy(position)
   }
 
-  override def onMouseDown(event:MouseEvent) = {
+  override def onMouseDown(event: MouseEvent) = {
     this.intersections.headOption match {
       case Some(obj)=> obj.`object`.position match {
         case p if p.equals(center)=> super.onMouseDown(event)

@@ -6,17 +6,15 @@ object Dependencies {
 
 	//libs for testing
   lazy val testing: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
-    //"com.lihaoyi" %%% "utest" % Versions.utest % "test"
+		"org.scalatest" %%% "scalatest" % Versions.scalaTest % Test,
+
+		"org.scalatest" %%% "scalatest-matchers" % Versions.scalaTest % Test
   ))
 
 	//akka-related libs
 	lazy val akka = Def.setting(Seq(
 
-		"com.typesafe.akka" %% "akka-stream-experimental" % Versions.akkaHttp,
-
-		"com.typesafe.akka" %% "akka-http-core-experimental" % Versions.akkaHttp,
-
-		"com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaHttp
+		"org.denigma" %%% "akka-http-extensions" % Versions.akkaHttpExtensions
 	))
 
 	lazy val templates = Def.setting(Seq(

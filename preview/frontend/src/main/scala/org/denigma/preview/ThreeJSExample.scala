@@ -22,17 +22,11 @@ import org.scalajs.dom.raw.HTMLTextAreaElement
 object Example extends CodeExample
 {
 
-
-
   def activate(): Unit = {
     val el:HTMLElement = dom.document.getElementById("container").asInstanceOf[HTMLElement]
-    val demo = new ExampleScene(el,1280,500)
+    val demo = new ExampleScene(el, 1280, 500)
     demo.render()
     activateCode()
-  }
-
-  def activateCodeMirror() = {
-
   }
 }
 
@@ -44,7 +38,7 @@ class CodeExample extends ExampleData
     activateCode("html","htmlmixed",htmlCode)
   }
 
-  def activateCode(id:String,mode:String,code:String): Unit = {
+  def activateCode(id: String, mode: String, code: String): Unit = {
     val params:EditorConfiguration =EditorConfig.mode(mode).lineNumbers(true).value(code)
     val editor = dom.document.getElementById(id) match {
       case el:HTMLTextAreaElement =>
@@ -56,7 +50,7 @@ class CodeExample extends ExampleData
   }
 }
 
-class ExampleScene(val container:HTMLElement, val width:Double, val height:Double) extends Container3D
+class ExampleScene(val container: HTMLElement, val width: Double, val height: Double) extends Container3D
 {
   val geometry = new BoxGeometry( 350, 300, 250 )
 
@@ -64,14 +58,14 @@ class ExampleScene(val container:HTMLElement, val width:Double, val height:Doubl
   val colors = List("green","red","blue","orange","purple","teal")
   val colorMap= Map("green"->0xA1CF64,"red"->0xD95C5C,"blue" -> 0x6ECFF5,"orange" ->0xF05940,"purple"->0x564F8A,"teal"->0x00B5AD)
 
-  def materialParams(name:String) = js.Dynamic.literal(
+  def materialParams(name: String) = js.Dynamic.literal(
     color = new Color(colorMap(name))
    // wireframe = true
   ).asInstanceOf[MeshLambertMaterialParameters]
 
   def randColorName = colors(Random.nextInt(colors.size))
 
-  protected def nodeTagFromTitle(title:String,colorName:String) =  textarea(title,`class`:=s"ui large ${colorName} message").render
+  protected def nodeTagFromTitle(title: String, colorName: String) =  textarea(title,`class`:=s"ui large ${colorName} message").render
 
 
   var meshes = addMesh(new Vector3(0,0,0))::addMesh(new Vector3(400,0,200))::addMesh(new Vector3(-400,0,200))::Nil
