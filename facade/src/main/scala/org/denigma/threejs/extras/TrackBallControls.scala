@@ -6,7 +6,7 @@ import org.scalajs.dom
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSName
 
-
+@js.native
 @JSName("THREE.TrackballControls")
 class TrackBallControls( camera:Camera) extends js.Object{
 

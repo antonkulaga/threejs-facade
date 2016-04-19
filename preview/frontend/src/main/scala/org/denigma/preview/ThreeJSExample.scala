@@ -23,7 +23,7 @@ object Example extends CodeExample
 {
 
   def activate(): Unit = {
-    val el:HTMLElement = dom.document.getElementById("container").asInstanceOf[HTMLElement]
+    val el: HTMLElement = dom.document.getElementById("container").asInstanceOf[HTMLElement]
     val demo = new ExampleScene(el, 1280, 500)
     demo.render()
     activateCode()
@@ -34,8 +34,8 @@ class CodeExample extends ExampleData
 {
 
   def activateCode(): Unit = {
-    activateCode("scala","clike",scalaCode)
-    activateCode("html","htmlmixed",htmlCode)
+    activateCode("scala", "clike", scalaCode)
+    activateCode("html", "htmlmixed", htmlCode)
   }
 
   def activateCode(id: String, mode: String, code: String): Unit = {
@@ -110,7 +110,7 @@ class ExampleScene(val container: HTMLElement, val width: Double, val height: Do
  * @param sc
  * @param center
  */
-class ExampleControls(cam:Camera, el:HTMLElement, sc:Scene, width:Double,height:Double,  center:Vector3 = new Vector3()) extends JumpCameraControls(cam,el,sc,width,height,center)
+class ExampleControls(cam: Camera, el: HTMLElement, sc: Scene, width: Double, height: Double, center: Vector3 = new Vector3()) extends JumpCameraControls(cam, el, sc, width, height, center)
 {
   import org.querki.jquery._
 
@@ -125,7 +125,7 @@ class ExampleControls(cam:Camera, el:HTMLElement, sc:Scene, width:Double,height:
         case m:Mesh=>
           m.material match
           {
-            case mat:MeshLambertMaterial=>      mat.wireframe = true
+            case mat: MeshLambertMaterial=>      mat.wireframe = true
             case _=> //do nothing
           }
 
@@ -133,10 +133,10 @@ class ExampleControls(cam:Camera, el:HTMLElement, sc:Scene, width:Double,height:
     }
 
     exit.keys.foreach{
-      case m:Mesh=>
+      case m: Mesh=>
         m.material match
         {
-          case mat:MeshLambertMaterial=>      mat.wireframe = false
+          case mat: MeshLambertMaterial=>      mat.wireframe = false
           case _=> //do nothing
         }
 

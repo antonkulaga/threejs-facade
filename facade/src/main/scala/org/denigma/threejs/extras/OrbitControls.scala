@@ -8,7 +8,7 @@ import org.scalajs.dom.raw.HTMLElement
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSName
 
-
+@js.native
 @JSName("THREE.OrbitControls")
 class OrbitControls( camera: Camera, element: HTMLElement) extends js.Object
 {
