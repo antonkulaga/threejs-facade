@@ -1,49 +1,51 @@
 package org.denigma.threejs.extensions
 
-import org.denigma.threejs.{Scene, PerspectiveCamera, Renderer}
+import org.denigma.threejs.{ Scene, PerspectiveCamera, Renderer }
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLElement
 
-trait SceneContainer{
+trait SceneContainer {
 
   val container: HTMLElement
 
-  def width:Double
+  def width: Double
 
-  def height:Double
+  def height: Double
 
-  type RendererType <:Renderer
+  type RendererType <: Renderer
 
   val scene = new Scene()
 
-  def distance:Double = 2000
+  def distance: Double = 2000
 
   lazy val renderer: RendererType = this.initRenderer()
 
   lazy val camera = initCamera()
 
-  def aspectRatio = width /height
+  def aspectRatio: Double = width / height
 
-  protected def initRenderer():RendererType
+  protected def initRenderer(): RendererType
 
   protected def initCamera() =
-  {
-    val camera = new PerspectiveCamera(40, this.aspectRatio, 1, 1000000)
-    camera.position.z = distance
-    camera
-  }
+    {
+      val fov = 40
+      val near = 1
+      val far = 1000000
+      val camera = new PerspectiveCamera(fov, this.aspectRatio, near, far)
+      camera.position.z = distance
+      camera
+    }
 
   protected def onEnterFrameFunction(double: Double): Unit = {
     onEnterFrame()
     render()
   }
 
-  def onEnterFrame():Unit = {
-      renderer.render(scene, camera)
+  def onEnterFrame(): Unit = {
+    renderer.render(scene, camera)
   }
 
-  def render() =  dom.window.requestAnimationFrame(  onEnterFrameFunction _ )
+  def render(): Int = dom.window.requestAnimationFrame(onEnterFrameFunction _)
 
 }
-
 
