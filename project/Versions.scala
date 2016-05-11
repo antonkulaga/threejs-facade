@@ -23,7 +23,7 @@ trait ScalaJSVersions {
 
 }
 
-//versions for libs that are shared between client and server
+// versions for libs that are shared between client and server
 trait SharedVersions
 {
 
