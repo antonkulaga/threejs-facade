@@ -2,12 +2,12 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt._
 
 object Dependencies {
-
+  // scalastyle:off
   //libs for testing
   lazy val testing: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
-    "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test,
+    "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test/*,
 
-    "org.scalatest" %%% "scalatest-matchers" % Versions.scalaTest % Test))
+    "org.scalatest" %%% "scalatest-matchers" % Versions.scalaTest % Test*/))
 
   //akka-related libs
   lazy val akka = Def.setting(Seq(

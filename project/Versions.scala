@@ -19,7 +19,7 @@ trait ScalaJSVersions {
 
 	val binding = "0.8.6"
 
-	val scalaTest = "3.0.0-SNAP13"
+	val scalaTest = "3.0.0-M15"
 
 }
 
@@ -42,7 +42,7 @@ trait WebJarsVersions{
 
 	val semanticUI = "2.1.8"
 
-	val threeJs = "r74"
+	val threeJs = "r76"
 
 	val codemirror = "5.13.2"
 }
