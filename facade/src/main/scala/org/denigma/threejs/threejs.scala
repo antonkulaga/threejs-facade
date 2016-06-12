@@ -520,7 +520,6 @@ class Geometry extends js.Object {
   var faces: js.Array[Face3] = js.native
   var faceVertexUvs: js.Array[js.Array[js.Array[Vector2]]] = js.native
   var morphTargets: js.Array[MorphTarget] = js.native
-  var morphColors: js.Array[MorphColor] = js.native
   var morphNormals: js.Array[MorphNormals] = js.native
   var skinWeights: js.Array[Double] = js.native
   var skinIndices: js.Array[Double] = js.native
@@ -1647,7 +1646,6 @@ class Line3 extends js.Object {
 trait Math extends js.Object {
   def generateUUID(): String = js.native
   def clamp(x: Double, a: Double, b: Double): Double = js.native
-  def clampBottom(x: Double, a: Double): Double = js.native
   def mapLinear(x: Double, a1: Double, a2: Double, b1: Double, b2: Double): Double = js.native
   def smoothstep(x: Double, min: Double, max: Double): Double = js.native
   def smootherstep(x: Double, min: Double, max: Double): Double = js.native
@@ -2678,23 +2676,6 @@ trait TypefaceData extends js.Object {
 }
 
 @js.native
-@JSName("THREE.FontUtils")
-object FontUtils extends js.Object {
-  var faces: js.Any = js.native
-  var face: String = js.native
-  var weight: String = js.native
-  var style: String = js.native
-  var size: Double = js.native
-  var divisions: Double = js.native
-  def getFace(): Face3 = js.native
-  def loadFace(data: TypefaceData): TypefaceData = js.native
-  def drawText(text: String): js.Any = js.native
-  def extractGlyphPoints(c: String, face: Face3, scale: Double, offset: Double, path: Path): js.Any = js.native
-  def generateShapes(text: String, parameters: js.Any = js.native): js.Array[Shape] = js.native
-  var Triangulate: js.Any = js.native
-}
-
-@js.native
 @JSName("THREE.GeometryUtils")
 object GeometryUtils extends js.Object {
   def merge(geometry1: Geometry, object2: Mesh, materialIndexOffset: Double = js.native): Unit = js.native
@@ -3196,12 +3177,6 @@ trait TextGeometryParameters extends js.Object {
   var bevelEnabled: Boolean = js.native
   var bevelThickness: Double = js.native
   var bevelSize: Double = js.native
-}
-
-@js.native
-@JSName("THREE.TextGeometry")
-class TextGeometry extends ExtrudeGeometry {
-  def this(text: String, TextGeometryParameters: TextGeometryParameters = js.native) = this()
 }
 
 @js.native
