@@ -3280,10 +3280,7 @@ class FaceNormalsHelper extends Line {
 @js.native
 @JSName("THREE.GridHelper")
 class GridHelper extends Line {
-  def this(size: Double, step: Double) = this()
-  var color1: Color = js.native
-  var color2: Color = js.native
-  def setColors(colorCenterLine: Double, colorGrid: Double): Unit = js.native
+  def this(size: Double, step: Double, color1: Color, color2: Color) = this()
 }
 
 @js.native
