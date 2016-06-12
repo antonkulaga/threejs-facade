@@ -603,8 +603,8 @@ class Object3D extends js.Object {
   def remove(`object`: Object3D): Unit = js.native
   def raycast(raycaster: Raycaster, intersects: js.Any): Unit = js.native
   def traverse(callback: js.Function1[Object3D, Any]): Unit = js.native
-  def getObjectById(id: String, recursive: Boolean): Object3D = js.native
-  def getObjectByName(name: String, recursive: Boolean = js.native): Object3D = js.native
+  def getObjectById(id: String): Object3D = js.native
+  def getObjectByName(name: String): Object3D = js.native
   def getChildByName(name: String, recursive: Boolean = js.native): Object3D = js.native
   def updateMatrix(): Unit = js.native
   def updateMatrixWorld(force: Boolean): Unit = js.native
@@ -1147,7 +1147,6 @@ class MeshNormalMaterial extends Material {
 @js.native
 trait MeshPhongMaterialParameters extends MaterialParameters {
   var color: Double = js.native
-  var ambient: Double = js.native
   var emissive: Double = js.native
   var specular: Double = js.native
   var shininess: Double = js.native
@@ -1183,7 +1182,6 @@ trait MeshPhongMaterialParameters extends MaterialParameters {
 class MeshPhongMaterial extends Material {
   def this(parameters: MeshPhongMaterialParameters = js.native) = this()
   var color: Color = js.native
-  var ambient: Color = js.native
   var emissive: Color = js.native
   var specular: Color = js.native
   var shininess: Double = js.native
