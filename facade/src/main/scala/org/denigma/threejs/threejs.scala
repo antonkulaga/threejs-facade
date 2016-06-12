@@ -571,7 +571,6 @@ class Object3D extends js.Object {
   var rotation: Euler = js.native
   var quaternion: Quaternion = js.native
   var scale: Vector3 = js.native
-  var renderDepth: Double = js.native
   var rotationAutoUpdate: Boolean = js.native
   var matrix: Matrix4 = js.native
   var matrixWorld: Matrix4 = js.native
@@ -2167,7 +2166,6 @@ class PointCloud extends Object3D {
   def this(geometry: Geometry, material: PointCloudMaterial = js.native) = this()
   var geometry: Geometry = js.native
   var material: Material = js.native
-  var sortParticles: Boolean = js.native
   override def raycast(raycaster: Raycaster, intersects: js.Any): Unit = js.native
   def clone(`object`: PointCloud): PointCloud = js.native
 }
