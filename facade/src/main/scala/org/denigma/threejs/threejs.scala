@@ -12,6 +12,7 @@ trait WebGLRenderingContext extends js.Object {
 
 }
 
+@js.native
 object THREE extends js.Object {
   var REVISION: String = js.native
   var CullFaceNone: CullFace = js.native
