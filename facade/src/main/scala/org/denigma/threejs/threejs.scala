@@ -543,7 +543,6 @@ class Geometry extends js.Object {
   def computeFaceNormals(): Unit = js.native
   def computeVertexNormals(areaWeighted: Boolean = js.native): Unit = js.native
   def computeMorphNormals(): Unit = js.native
-  def computeTangents(): Unit = js.native
   def computeLineDistances(): Unit = js.native
   def computeBoundingBox(): Unit = js.native
   def computeBoundingSphere(): Unit = js.native
@@ -634,7 +633,7 @@ trait Intersection extends js.Object {
 trait RaycasterParameters extends js.Object {
   var Sprite: js.Any = js.native
   var Mesh: js.Any = js.native
-  var PointCloud: js.Any = js.native
+  var Points: js.Any = js.native
   var LOD: js.Any = js.native
   var Line: js.Any = js.native
 }
@@ -1214,7 +1213,7 @@ class MeshPhongMaterial extends Material {
 }
 
 @js.native
-trait PointCloudMaterialParameters extends MaterialParameters {
+trait PointsMaterialParameters extends MaterialParameters {
   var color: Double = js.native
   var map: Texture = js.native
   var size: Double = js.native
@@ -1224,26 +1223,26 @@ trait PointCloudMaterialParameters extends MaterialParameters {
 }
 
 @js.native
-@JSName("THREE.PointCloudMaterial")
-class PointCloudMaterial extends Material {
-  def this(parameters: PointCloudMaterialParameters = js.native) = this()
+@JSName("THREE.PointsMaterial")
+class PointsMaterial extends Material {
+  def this(parameters: PointsMaterialParameters = js.native) = this()
   var color: Color = js.native
   var map: Texture = js.native
   var size: Double = js.native
   var sizeAttenuation: Boolean = js.native
   var vertexColors: Boolean = js.native
   var fog: Boolean = js.native
-  override def clone(): PointCloudMaterial = js.native
+  override def clone(): PointsMaterial = js.native
 }
 
 @js.native
 @JSName("THREE.ParticleBasicMaterial")
-class ParticleBasicMaterial extends PointCloudMaterial {
+class ParticleBasicMaterial extends PointsMaterial {
 }
 
 @js.native
 @JSName("THREE.ParticleSystemMaterial")
-class ParticleSystemMaterial extends PointCloudMaterial {
+class ParticleSystemMaterial extends PointsMaterial {
 }
 
 @js.native
@@ -2100,6 +2099,11 @@ class Line extends Object3D {
 }
 
 @js.native
+@JSName("THREE.LineSegments")
+class LineSegments extends Line {
+}
+
+@js.native
 sealed trait LineType extends js.Object {
 }
 
@@ -2159,13 +2163,13 @@ class MorphAnimMesh extends Mesh {
 }
 
 @js.native
-@JSName("THREE.PointCloud")
-class PointCloud extends Object3D {
-  def this(geometry: Geometry, material: PointCloudMaterial = js.native) = this()
+@JSName("THREE.Points")
+class Points extends Object3D {
+  def this(geometry: Geometry, material: PointsMaterial = js.native) = this()
   var geometry: Geometry = js.native
   var material: Material = js.native
   override def raycast(raycaster: Raycaster, intersects: js.Any): Unit = js.native
-  def clone(`object`: PointCloud): PointCloud = js.native
+  def clone(`object`: Points): Points = js.native
 }
 
 @js.native
@@ -2274,6 +2278,17 @@ trait WebGLRendererParameters extends js.Object {
 }
 
 @js.native
+trait WebGLRendererShadowMap extends js.Object {
+  var enabled: Boolean = js.native
+  var autoUpdate: Boolean = js.native
+  var `type`: ShadowMapType = js.native
+  var cullFace: CullFace = js.native
+  var debug: Boolean = js.native
+  var cascade: Boolean = js.native
+  var plugin: ShadowMapPlugin = js.native
+}
+
+@js.native
 @JSName("THREE.WebGLRenderer")
 class WebGLRenderer extends Renderer {
   def this(parameters: WebGLRendererParameters = js.native) = this()
@@ -2286,19 +2301,13 @@ class WebGLRenderer extends Renderer {
   var sortObjects: Boolean = js.native
   var gammaInput: Boolean = js.native
   var gammaOutput: Boolean = js.native
-  var shadowMapEnabled: Boolean = js.native
-  var shadowMapAutoUpdate: Boolean = js.native
-  var shadowMapType: ShadowMapType = js.native
-  var shadowMapCullFace: CullFace = js.native
-  var shadowMapDebug: Boolean = js.native
-  var shadowMapCascade: Boolean = js.native
   var maxMorphTargets: Double = js.native
   var maxMorphNormals: Double = js.native
   var autoScaleCubemaps: Boolean = js.native
   var renderPluginsPre: js.Array[RendererPlugin] = js.native
   var renderPluginsPost: js.Array[RendererPlugin] = js.native
   var info: js.Any = js.native
-  var shadowMapPlugin: ShadowMapPlugin = js.native
+  var shadowMap: WebGLRendererShadowMap = js.native
   def getContext(): WebGLRenderingContext = js.native
   def supportsVertexTextures(): Boolean = js.native
   def supportsFloatTextures(): Boolean = js.native
