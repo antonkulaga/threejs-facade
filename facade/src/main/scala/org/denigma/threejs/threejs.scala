@@ -2331,7 +2331,6 @@ class WebGLRenderer extends Renderer {
   def renderBuffer(camera: Camera, lights: js.Array[Light], fog: Fog, material: Material, geometryGroup: js.Any, `object`: Object3D): Unit = js.native
   def render(scene: Scene, camera: Camera, renderTarget: RenderTarget = js.native, forceClear: Boolean = js.native): Unit = js.native
   def renderImmediateObject(camera: Camera, lights: js.Array[Light], fog: Fog, material: Material, `object`: Object3D): Unit = js.native
-  def initMaterial(material: Material, lights: js.Array[Light], fog: Fog, `object`: Object3D): Unit = js.native
   def setFaceCulling(cullFace: CullFace = js.native, frontFace: FrontFaceDirection = js.native): Unit = js.native
   def setMaterialFaces(material: Material): Unit = js.native
   def setDepthTest(depthTest: Boolean): Unit = js.native
