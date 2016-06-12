@@ -655,10 +655,30 @@ class Raycaster extends js.Object {
 }
 
 @js.native
+@JSName("THREE.LightShadow")
+class LightShadow extends js.Object {
+  def this(camera: Camera) = this()
+  var camera: Camera = js.native
+  var bias: Double = js.native
+  var radius: Double = js.native
+  var mapSize: Vector2 = js.native
+  var matrix: Matrix4 = js.native
+  var map: WebGLRenderTarget = js.native
+  def copy(src: LightShadow): Unit = js.native
+}
+
+@js.native
+@JSName("THREE.DirectionalLightShadow")
+class DirectionalLightShadow extends LightShadow {
+  def this(light: DirectionalLight) = this()
+}
+
+@js.native
 @JSName("THREE.Light")
 class Light extends Object3D {
   def this(hex: Double = js.native) = this()
   var color: Color = js.native
+  val shadow: LightShadow = js.native
   def clone(light: Light): Light = js.native
 }
 
@@ -689,32 +709,7 @@ class DirectionalLight extends Light {
   def this(hex: Double = js.native, intensity: Double = js.native) = this()
   var target: Object3D = js.native
   var intensity: Double = js.native
-
-  var onlyShadow: Boolean = js.native
-  var shadowCameraNear: Double = js.native
-  var shadowCameraFar: Double = js.native
-  var shadowCameraLeft: Double = js.native
-  var shadowCameraRight: Double = js.native
-  var shadowCameraTop: Double = js.native
-  var shadowCameraBottom: Double = js.native
-  var shadowCameraVisible: Boolean = js.native
-  var shadowBias: Double = js.native
-  var shadowDarkness: Double = js.native
-  var shadowMapWidth: Double = js.native
-  var shadowMapHeight: Double = js.native
-  var shadowCascade: Boolean = js.native
-  var shadowCascadeOffset: Vector3 = js.native
-  var shadowCascadeCount: Double = js.native
-  var shadowCascadeBias: js.Array[Double] = js.native
-  var shadowCascadeWidth: js.Array[Double] = js.native
-  var shadowCascadeHeight: js.Array[Double] = js.native
-  var shadowCascadeNearZ: js.Array[Double] = js.native
-  var shadowCascadeFarZ: js.Array[Double] = js.native
-  var shadowCascadeArray: js.Array[DirectionalLight] = js.native
-  var shadowMap: RenderTarget = js.native
-  var shadowMapSize: Double = js.native
-  var shadowCamera: Camera = js.native
-  var shadowMatrix: Matrix4 = js.native
+  override val shadow: DirectionalLightShadow = js.native
   override def clone(): DirectionalLight = js.native
 }
 
@@ -1148,7 +1143,6 @@ trait MeshPhongMaterialParameters extends MaterialParameters {
   var emissive: Double = js.native
   var specular: Double = js.native
   var shininess: Double = js.native
-  var metal: Boolean = js.native
   var wrapAround: Boolean = js.native
   var wrapRGB: Vector3 = js.native
   var map: Texture = js.native
@@ -1183,7 +1177,6 @@ class MeshPhongMaterial extends Material {
   var emissive: Color = js.native
   var specular: Color = js.native
   var shininess: Double = js.native
-  var metal: Boolean = js.native
   var wrapAround: Boolean = js.native
   var wrapRGB: Vector3 = js.native
   var map: Texture = js.native
@@ -1335,7 +1328,7 @@ class Box2 extends js.Object {
   def setFromCenterAndSize(center: Vector2, size: Double): Box2 = js.native
   def copy(box: Box2): Box2 = js.native
   def makeEmpty(): Box2 = js.native
-  def empty(): Boolean = js.native
+  def isEmpty(): Boolean = js.native
   def center(optionalTarget: Vector2 = js.native): Vector2 = js.native
   def size(optionalTarget: Vector2 = js.native): Vector2 = js.native
   def expandByPoint(point: Vector2): Box2 = js.native
@@ -1366,7 +1359,7 @@ class Box3 extends js.Object {
   def setFromObject(`object`: Object3D): Box3 = js.native
   def copy(box: Box3): Box3 = js.native
   def makeEmpty(): Box3 = js.native
-  def empty(): Boolean = js.native
+  def isEmpty(): Boolean = js.native
   def center(optionalTarget: Vector3 = js.native): Vector3 = js.native
   def size(optionalTarget: Vector3 = js.native): Vector3 = js.native
   def expandByPoint(point: Vector3): Box3 = js.native
@@ -2243,7 +2236,7 @@ class CanvasRenderer extends Renderer {
   override def setSize(width: Double, height: Double, updateStyle: Boolean = js.native): Unit = js.native
   def setViewport(x: Double, y: Double, width: Double, height: Double): Unit = js.native
   def setScissor(): Unit = js.native
-  def enableScissorTest(): Unit = js.native
+  def setScissorTest(enable: Boolean): Unit = js.native
   def setClearColor(color: Color, opacity: Double = js.native): Unit = js.native
   def setClearColorHex(hex: Double, alpha: Double = js.native): Unit = js.native
   def getClearColor(): Color = js.native
@@ -2316,7 +2309,7 @@ class WebGLRenderer extends Renderer {
   override def setSize(width: Double, height: Double, updateStyle: Boolean = js.native): Unit = js.native
   def setViewport(x: Double = js.native, y: Double = js.native, width: Double = js.native, height: Double = js.native): Unit = js.native
   def setScissor(x: Double, y: Double, width: Double, height: Double): Unit = js.native
-  def enableScissorTest(enable: Boolean): Unit = js.native
+  def setScissorTest(enable: Boolean): Unit = js.native
   def setClearColor(color: Color, alpha: Double = js.native): Unit = js.native
   def setClearColorHex(hex: Double, alpha: Double): Unit = js.native
   def getClearColor(): Color = js.native
@@ -2925,14 +2918,6 @@ class Shape extends Path {
 @JSName("THREE.ArcCurve")
 class ArcCurve extends EllipseCurve {
   def this(aX: Double, aY: Double, aRadius: Double, aStartAngle: Double, aEndAngle: Double, aClockwise: Boolean) = this()
-}
-
-@js.native
-@JSName("THREE.ClosedSplineCurve3")
-class ClosedSplineCurve3 extends Curve {
-  def this(points: js.Array[Vector3] = js.native) = this()
-  var points: js.Array[Vector3] = js.native
-  override def getPoint(t: Double): Vector3 = js.native
 }
 
 @js.native
