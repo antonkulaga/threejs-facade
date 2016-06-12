@@ -784,7 +784,6 @@ class Loader extends js.Object {
   def addStatusElement(): HTMLElement = js.native
   def updateProgress(progress: Progress): Unit = js.native
   def extractUrlBase(url: String): String = js.native
-  def initMaterials(materials: js.Array[Material], texturePath: String): js.Array[Material] = js.native
   def needsTangents(materials: js.Array[Material]): Boolean = js.native
   def createMaterial(m: Material, texturePath: String): Boolean = js.native
 }
@@ -2221,12 +2220,15 @@ trait Renderer extends js.Object {
   def render(scene: Scene, camera: Camera): Unit = js.native
   def setSize(width: Double, height: Double, updateStyle: Boolean = js.native): Unit = js.native
   var domElement: HTMLCanvasElement = js.native
+  var pixelRatio: Double = js.native
+  def setPixelRatio(value: Double): Unit = js.native
+  def getPixelRatio(): Double = js.native
 }
 
 @js.native
 trait CanvasRendererParameters extends js.Object {
   var canvas: HTMLCanvasElement = js.native
-  var devicePixelRatio: Double = js.native
+  var pixelRatio: Double = js.native
 }
 
 @js.native
@@ -2234,7 +2236,6 @@ trait CanvasRendererParameters extends js.Object {
 class CanvasRenderer extends Renderer {
   def this(parameters: CanvasRendererParameters = js.native) = this()
 
-  var devicePixelRatio: Double = js.native
   var autoClear: Boolean = js.native
   var sortObjects: Boolean = js.native
   var sortElements: Boolean = js.native
@@ -2274,7 +2275,6 @@ trait WebGLRendererParameters extends js.Object {
   var preserveDrawingBuffer: Boolean = js.native
   var clearColor: Double = js.native
   var clearAlpha: Double = js.native
-  var devicePixelRatio: Double = js.native
 }
 
 @js.native
@@ -2283,7 +2283,6 @@ class WebGLRenderer extends Renderer {
   def this(parameters: WebGLRendererParameters = js.native) = this()
 
   var context: js.Any = js.native
-  var devicePixelRatio: Double = js.native
   var autoClear: Boolean = js.native
   var autoClearColor: Boolean = js.native
   var autoClearDepth: Boolean = js.native
