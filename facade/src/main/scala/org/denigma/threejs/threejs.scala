@@ -2013,7 +2013,7 @@ class Vector3 extends Vector {
   def distanceToSquared(v: Vector3): Double = js.native
   def setFromMatrixPosition(m: Matrix4): Vector3 = js.native
   def setFromMatrixScale(m: Matrix4): Vector3 = js.native
-  def setFromMatrixColumn(index: Double, matrix: Matrix4): Vector3 = js.native
+  def setFromMatrixColumn(matrix: Matrix4, index: Double): Vector3 = js.native
   def equals(v: Vector3): Boolean = js.native
   def fromArray(xyz: js.Array[Double]): Vector3 = js.native
   def toArray(): js.Array[Double] = js.native
@@ -2372,7 +2372,6 @@ class WebGLRenderTarget extends RenderTarget {
   var depthBuffer: Boolean = js.native
   var stencilBuffer: Boolean = js.native
   var generateMipmaps: Boolean = js.native
-  var shareDepthFrom: js.Any = js.native
   override def clone(): WebGLRenderTarget = js.native
   def dispose(): Unit = js.native
   def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native

@@ -1,8 +1,8 @@
 threejs facade
 ==============
 
-This if a facade of threejs javascript 3D library ( http://threejs.org/ ). 
-All the code is inside facade folder (threejs subproject). 
+This if a facade of threejs javascript 3D library ( http://threejs.org/ ).
+All the code is inside facade folder (threejs subproject).
 It also contains some extra classes for esier scence creation and css3d rendering.
 
 Usage
@@ -11,7 +11,7 @@ Usage
 In order to resolve a lib you should add a resolver::
 ```scala
 resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases") //add resolver
-libraryDependencies += "org.denigma" %%% "threejs-facade" % "0.0.74-0.1.6" //add dependency
+libraryDependencies += "org.denigma" %%% "threejs-facade" % "0.0.75-0.1.6" //add dependency
 ```
 
 Gettings started
