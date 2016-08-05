@@ -8,10 +8,8 @@ import scalajs.js.annotation._
 import scalajs.js.typedarray._
 
 @js.native
-trait WebGLRenderingContext extends js.Object {
-
-}
-
+trait WebGLRenderingContext extends js.Object
+@js.native
 object THREE extends js.Object {
   var REVISION: String = js.native
   var CullFaceNone: CullFace = js.native
@@ -960,11 +958,8 @@ trait LineBasicMaterialParameters extends MaterialParameters {
 }
 
 @js.native
-trait LineMaterial extends Material
-
-@js.native
 @JSName("THREE.LineBasicMaterial")
-class LineBasicMaterial extends LineMaterial {
+class LineBasicMaterial extends Material {
   def this(parameters: LineBasicMaterialParameters = js.native) = this()
   var color: Color = js.native
   var linewidth: Double = js.native
@@ -988,7 +983,7 @@ trait LineDashedMaterialParameters extends MaterialParameters {
 
 @js.native
 @JSName("THREE.LineDashedMaterial")
-class LineDashedMaterial extends LineMaterial {
+class LineDashedMaterial extends Material {
   def this(parameters: LineDashedMaterialParameters = js.native) = this()
   var color: Color = js.native
   var linewidth: Double = js.native
@@ -2095,9 +2090,9 @@ class Bone extends Object3D {
 @js.native
 @JSName("THREE.Line")
 class Line extends Object3D {
-  def this(geometry: Geometry = js.native, material: LineMaterial = js.native, `type`: Double = js.native) = this()
+  def this(geometry: Geometry = js.native, material: LineBasicMaterial = js.native, `type`: Double = js.native) = this()
   var geometry: Geometry = js.native
-  var material: LineMaterial = js.native
+  var material: LineBasicMaterial = js.native
   var `type`: LineType = js.native
   override def raycast(raycaster: Raycaster, intersects: js.Any): Unit = js.native
   def clone(`object`: Line): Line = js.native

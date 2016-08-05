@@ -6,7 +6,7 @@ import org.scalajs.dom.raw.HTMLElement
 
 trait SceneContainer {
 
-  val container: HTMLElement
+  def container: HTMLElement
 
   def width: Double
 
@@ -14,7 +14,7 @@ trait SceneContainer {
 
   type RendererType <: Renderer
 
-  val scene = new Scene()
+  lazy val scene = new Scene()
 
   def distance: Double = 2000
 

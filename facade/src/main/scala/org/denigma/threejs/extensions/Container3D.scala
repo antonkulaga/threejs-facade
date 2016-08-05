@@ -14,9 +14,11 @@ trait Container3D extends SceneContainer {
   container.style.position = "relative"
 
   override type RendererType = WebGLRenderer
+
   val absolute = "absolute"
   val positionZero = "0"
-  protected def initRenderer = {
+
+  protected def initRenderer() = {
     val params = Dynamic.literal(
       antialias = true,
       alpha = true // canvas = container

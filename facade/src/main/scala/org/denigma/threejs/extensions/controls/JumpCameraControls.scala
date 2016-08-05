@@ -1,10 +1,11 @@
 package org.denigma.threejs.extensions.controls
 
-import org.denigma.threejs.extensions.animations.{ Animation, Scheduler }
-import org.denigma.threejs.{ Vector3, Scene, Camera }
+import org.denigma.threejs.extensions.animations.{Animation, Scheduler}
+import org.denigma.threejs.{Camera, Scene, Vector3}
 import org.scalajs.dom
-import org.scalajs.dom.raw.HTMLElement
-import org.scalajs.dom.{ MouseEvent }
+import org.scalajs.dom.raw.{Element, HTMLElement}
+import org.scalajs.dom.MouseEvent
+
 import scala.concurrent.duration
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.MILLISECONDS
@@ -20,7 +21,7 @@ import scala.language.postfixOps
  * @param center
  */
 class JumpCameraControls(val camera: Camera,
-  val element: HTMLElement, //scalastyle:ignore
+  val element: Element, //scalastyle:ignore
   val scene: Scene,
   val width: Double, val height: Double,
   center: Vector3 = new Vector3())

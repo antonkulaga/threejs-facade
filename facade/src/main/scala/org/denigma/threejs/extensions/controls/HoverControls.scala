@@ -1,28 +1,20 @@
 package org.denigma.threejs.extensions.controls
 
-import org.denigma.threejs.{ Vector2, Vector3, Camera }
+import org.denigma.threejs.{Camera, Vector2, Vector3}
 import org.scalajs.dom
-import HoverControls.HoverState
-import org.scalajs.dom.raw.{ Event, MouseEvent, HTMLElement }
+import org.scalajs.dom.raw.{Element, Event, HTMLElement, MouseEvent}
 
 import scala.scalajs.js
-
-object HoverControls {
-
-  class HoverState
-  case object Zoom extends HoverState
-  case object Rotate extends HoverState
-  case object Pan extends HoverState
-  case object Calm extends HoverState
-
+object HoverState{
+  trait State
+  case object Zoom extends State
+  case object Rotate extends State
+  case object Pan extends State
+  case object Calm extends State
+  case object Move extends State
 }
 
-class HoverControls(camera: Camera, element: HTMLElement, val center: Vector3 = new Vector3()) extends RotateControls {
-
-  var enabled = true
-
-  var userZoom = true
-  var userZoomSpeed = 1.0
+class HoverControls(camera: Camera, element: Element, val center: Vector3 = new Vector3()) extends RotateControls {
 
   var userRotate = true
   var userRotateSpeed = 1.0
@@ -35,9 +27,6 @@ class HoverControls(camera: Camera, element: HTMLElement, val center: Vector3 = 
 
   var minPolarAngle = 0 // radians
   var maxPolarAngle = Math.PI // radians
-
-  var minDistance = 0
-  var maxDistance = Double.MaxValue //infinity?
 
   object Keys {
 
@@ -57,28 +46,19 @@ class HoverControls(camera: Camera, element: HTMLElement, val center: Vector3 = 
   protected var rotateEnd = new Vector2()
   protected var rotateDelta = new Vector2()
 
-  protected var zoomStart = new Vector2()
-  protected var zoomEnd = new Vector2()
-  protected var zoomDelta = new Vector2()
-
   protected var phiDelta: Double = 0
   protected var thetaDelta: Double = 0
-  var scale: Double = 1.0
 
   var lastPosition = new Vector3()
 
   def autoRotationAngle(): Double = 2 * Math.PI / 60 / 60 * autoRotateSpeed
 
-  def zoomScale(): Double = Math.pow(0.95, userZoomSpeed)
-
-  var state: HoverState = HoverControls.Calm
+  var state: HoverState.State = HoverState.Calm
 
   def rotateLeft(angle: Double = autoRotationAngle()): Unit = thetaDelta -= angle
   def rotateRight(angle: Double = autoRotationAngle()): Unit = thetaDelta += angle
   def rotateUp(angle: Double = autoRotationAngle()): Unit = phiDelta -= angle
   def rotateDown(angle: Double = autoRotationAngle()): Unit = phiDelta += angle
-  def zoomIn(zScale: Double = this.zoomScale()): Unit = scale /= zScale
-  def zoomOut(zScale: Double = this.zoomScale()): Unit = scale *= zScale
 
   def pan(distance: Vector3): Vector3 = {
     distance.transformDirection(this.camera.matrix)
@@ -143,20 +123,19 @@ class HoverControls(camera: Camera, element: HTMLElement, val center: Vector3 = 
   def onMouseDown(event: MouseEvent) = if (userRotate && enabled) {
 
     //event.preventDefault()
-    if (state == HoverControls.Calm)
+    if (state == HoverState.Calm)
       state = event.button match {
-        case 0 => HoverControls.Rotate
-        case 1 => HoverControls.Zoom
-        case 2 => HoverControls.Pan
+        case 0 => HoverState.Rotate
+        case 1 => HoverState.Zoom
+        case 2 => HoverState.Pan
       }
 
     state match {
-      case HoverControls.Rotate =>
-        rotateStart.set(event.clientX, event.clientY)
+      case HoverState.Rotate => rotateStart.set(event.clientX, event.clientY)
 
-      case HoverControls.Zoom => zoomStart.set(event.clientX, event.clientY)
+      case HoverState.Zoom => zoomStart.set(event.clientX, event.clientY)
 
-      case HoverControls.Pan => //nothing
+      case HoverState.Pan => //nothing
 
       case _ => //nothing
 
@@ -181,19 +160,13 @@ class HoverControls(camera: Camera, element: HTMLElement, val center: Vector3 = 
 
   def rotateOnMove(event: MouseEvent) = if (enabled && userRotate) {
     state match {
-      case HoverControls.Rotate =>
+      case HoverState.Rotate =>
 
         mouseRotate(event.clientX, event.clientY)
 
-      case HoverControls.Zoom =>
+      case HoverState.Zoom => computeZoom(event)
 
-        zoomEnd.set(event.clientX, event.clientY)
-        zoomDelta.subVectors(zoomEnd, zoomStart)
-
-        if (zoomDelta.y > 0) zoomIn() else zoomOut()
-
-        zoomStart.copy(zoomEnd)
-      case HoverControls.Pan =>
+      case HoverState.Pan =>
         val evd = event.asInstanceOf[js.Dynamic]
         val movementX: Double = evd.movementX.asInstanceOf[Double]
         val movementY: Double = evd.movementY.asInstanceOf[Double]
@@ -208,7 +181,6 @@ class HoverControls(camera: Camera, element: HTMLElement, val center: Vector3 = 
 
   def onMouseMove(event: MouseEvent) = {
     rotateOnMove(event)
-
   }
 
   def onContextMenu(event: Event): js.Any = {
@@ -217,22 +189,10 @@ class HoverControls(camera: Camera, element: HTMLElement, val center: Vector3 = 
   }
 
   def onMouseUp(event: MouseEvent): Unit = if (enabled && userRotate) {
-    state = HoverControls.Calm
+    state = HoverState.Calm
   }
 
-  def onMouseWheel(event: dom.MouseEvent) = if (enabled && userZoom) {
-    var delta = 0
-    val wheel = event.asInstanceOf[js.Dynamic]
-    if (!js.isUndefined(wheel.wheelDelta)) { // WebKit / Opera / Explorer 9
-      delta = wheel.wheelDelta.asInstanceOf[Int]
-    } else if (!js.isUndefined(wheel.detail)) { // Firefox
-      delta = -event.detail
-    }
-    if (delta > 0) zoomOut() else zoomIn()
-
-  }
-
-  def attach(el: HTMLElement) = {
+  def attach(el: Element) = {
 
     el.addEventListener("mousedown", (this.onMouseDown _).asInstanceOf[Function[Event, _]])
     el.addEventListener("mousemove", (this.onMouseMove _).asInstanceOf[Function[Event, _]], false)
