@@ -324,6 +324,7 @@ class OrthographicCamera extends Camera {
   var bottom: Double = js.native
   var near: Double = js.native
   var far: Double = js.native
+  var zoom: Double = js.native
   def updateProjectionMatrix(): Unit = js.native
   override def clone(): OrthographicCamera = js.native
 }
@@ -447,7 +448,7 @@ class Clock extends js.Object {
 }
 
 @js.native
-@JSName("THREE.EventDispatcher")
+  @JSName("THREE.EventDispatcher")
 class EventDispatcher extends js.Object {
   def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
   def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
@@ -1776,10 +1777,10 @@ class Quaternion extends js.Object {
   def setFromEuler(euler: Euler, update: Boolean = js.native): Quaternion = js.native
   def setFromAxisAngle(axis: Vector3, angle: Double): Quaternion = js.native
   def setFromRotationMatrix(m: Matrix4): Quaternion = js.native
-  def setFromUnitVectors(vFrom: Vector3, vTo: Vector4): Quaternion = js.native
+  def setFromUnitVectors(vFrom: Vector3, vTo: Vector3): Quaternion = js.native
   def inverse(): Quaternion = js.native
   def conjugate(): Quaternion = js.native
-  def dot(v: Vector3): Double = js.native
+  def dot(v: Quaternion): Double = js.native
   def lengthSq(): Double = js.native
   def length(): Double = js.native
   def normalize(): Quaternion = js.native
@@ -2021,7 +2022,8 @@ class Vector3 extends Vector {
   def distanceToSquared(v: Vector3): Double = js.native
   def setFromMatrixPosition(m: Matrix4): Vector3 = js.native
   def setFromMatrixScale(m: Matrix4): Vector3 = js.native
-  def setFromMatrixColumn(index: Double, matrix: Matrix4): Vector3 = js.native
+  def setFromSpherical(s: Spherical): Vector3 = js.native
+  def setFromMatrixColumn(matrix: Matrix4, index: Double): Vector3 = js.native
   def equals(v: Vector3): Boolean = js.native
   def fromArray(xyz: js.Array[Double]): Vector3 = js.native
   def toArray(): js.Array[Double] = js.native
@@ -2074,6 +2076,21 @@ class Vector4 extends Vector {
   def fromArray(xyzw: js.Array[Double]): js.Array[Double] = js.native
   def toArray(): js.Array[Double] = js.native
   override def clone(): Vector4 = js.native
+}
+
+@js.native
+@JSName("THREE.Spherical")
+class Spherical() extends js.Object {
+  def this(radius: Double = js.native, phi: Double = js.native, theta: Double = js.native) = this()
+  var radius: Double = js.native
+  var phi: Double = js.native
+  var theta: Double = js.native
+  def set(radius: Double, phi: Double, theta: Double): Spherical = js.native
+  override def clone(): Spherical = js.native
+  def copy(other: Spherical): Spherical = js.native
+  // restrict phi to be betwee EPS and PI-EPS
+  def makeSafe(): Spherical = js.native
+  def setFromVector3(vec3: Vector3): Spherical = js.native
 }
 
 @js.native
@@ -3495,3 +3512,14 @@ object ShaderFlares extends js.Object {
   var lensFlareVertexTexture: js.Any = js.native
   var lensFlare: js.Any = js.native
 }
+
+@js.native
+@JSName("Stats")
+class Stats extends js.Object {
+  def showPanel(i: Int): Unit = js.native
+  def begin(): js.Any = js.native
+  def end(): js.Any = js.native
+  var dom: HTMLElement = js.native
+}
+
+
