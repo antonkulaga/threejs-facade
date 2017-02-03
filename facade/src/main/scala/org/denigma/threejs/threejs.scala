@@ -1677,7 +1677,6 @@ trait Matrix extends js.Object {
 @js.native
 @JSName("THREE.Matrix3")
 class Matrix3 extends Matrix {
-  def this(n11: Double, n12: Double, n13: Double, n21: Double, n22: Double, n23: Double, n31: Double, n32: Double, n33: Double) = this()
 
   def set(n11: Double, n12: Double, n13: Double, n21: Double, n22: Double, n23: Double, n31: Double, n32: Double, n33: Double): Matrix3 = js.native
   override def identity(): Matrix3 = js.native
@@ -1699,8 +1698,6 @@ class Matrix3 extends Matrix {
 @js.native
 @JSName("THREE.Matrix4")
 class Matrix4 extends Matrix {
-  def this(n11: Double = js.native, n12: Double = js.native, n13: Double = js.native, n14: Double = js.native, n21: Double = js.native, n22: Double = js.native, n23: Double = js.native, n24: Double = js.native, n31: Double = js.native, n32: Double = js.native, n33: Double = js.native, n34: Double = js.native, n41: Double = js.native, n42: Double = js.native, n43: Double = js.native, n44: Double = js.native) = this()
-
   def set(n11: Double, n12: Double, n13: Double, n14: Double, n21: Double, n22: Double, n23: Double, n24: Double, n31: Double, n32: Double, n33: Double, n34: Double, n41: Double, n42: Double, n43: Double, n44: Double): Matrix4 = js.native
   override def identity(): Matrix4 = js.native
   def copy(m: Matrix4): Matrix4 = js.native
