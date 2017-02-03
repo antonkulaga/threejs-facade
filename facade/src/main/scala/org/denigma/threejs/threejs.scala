@@ -447,11 +447,11 @@ class Clock extends js.Object {
   def getDelta(): Double = js.native
 }
 
+
 @js.native
-  @JSName("THREE.EventDispatcher")
-class EventDispatcher extends js.Object {
+trait EventDispatcher extends js.Object {
   def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
+  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Boolean = js.native
   def removeEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
   def dispatchEvent(event: js.Any): Unit = js.native
 }
@@ -510,7 +510,7 @@ trait BoundingSphere extends js.Object {
 
 @js.native
 @JSName("THREE.Geometry")
-class Geometry extends js.Object {
+class Geometry extends js.Object with EventDispatcher {
   var id: Double = js.native
   var uuid: String = js.native
   var name: String = js.native
@@ -551,15 +551,11 @@ class Geometry extends js.Object {
   def makeGroups(usesFaceMaterial: Boolean, maxVerticesInGroup: Double): Unit = js.native
   override def clone(): Geometry = js.native
   def dispose(): Unit = js.native
-  def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def removeEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def dispatchEvent(event: js.Any): Unit = js.native
 }
 
 @js.native
 @JSName("THREE.Object3D")
-class Object3D extends js.Object {
+class Object3D extends js.Object with EventDispatcher {
   var id: Double = js.native
   var uuid: String = js.native
   var name: String = js.native
@@ -610,10 +606,6 @@ class Object3D extends js.Object {
   def updateMatrixWorld(force: Boolean): Unit = js.native
   def updateMatrixWorld(): Unit = js.native
   def clone(`object`: Object3D = js.native, recursive: Boolean = js.native): Object3D = js.native
-  def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def removeEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def dispatchEvent(event: js.Any): Unit = js.native
 }
 
 @js.native
@@ -919,7 +911,7 @@ trait MaterialParameters extends js.Object {
 
 @js.native
 @JSName("THREE.Material")
-class Material extends js.Object {
+class Material extends js.Object with EventDispatcher {
   var id: Double = js.native
   var uuid: String = js.native
   var name: String = js.native
@@ -942,10 +934,6 @@ class Material extends js.Object {
   def setValues(values: Object): Unit = js.native
   def clone(material: Material): Material = js.native
   def dispose(): Unit = js.native
-  def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def removeEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def dispatchEvent(event: js.Any): Unit = js.native
 }
 
 @js.native
@@ -2370,7 +2358,7 @@ trait WebGLRenderTargetOptions extends js.Object {
 
 @js.native
 @JSName("THREE.WebGLRenderTarget")
-class WebGLRenderTarget extends RenderTarget {
+class WebGLRenderTarget extends RenderTarget with EventDispatcher {
   def this(width: Double, height: Double, options: WebGLRenderTargetOptions = js.native) = this()
   var width: Double = js.native
   var height: Double = js.native
@@ -2389,10 +2377,6 @@ class WebGLRenderTarget extends RenderTarget {
   var shareDepthFrom: js.Any = js.native
   override def clone(): WebGLRenderTarget = js.native
   def dispose(): Unit = js.native
-  def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def removeEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def dispatchEvent(event: js.Any): Unit = js.native
 }
 
 @js.native
@@ -2638,7 +2622,7 @@ class DataTexture extends Texture {
 
 @js.native
 @JSName("THREE.Texture")
-class Texture extends js.Object {
+class Texture extends js.Object with EventDispatcher {
   def this(image: js.Any, mapping: Mapping = js.native, wrapS: Wrapping = js.native, wrapT: Wrapping = js.native, magFilter: TextureFilter = js.native, minFilter: TextureFilter = js.native, format: PixelFormat = js.native, `type`: TextureDataType = js.native, anisotropy: Double = js.native) = this()
   var id: Double = js.native
   var uuid: String = js.native
@@ -2664,10 +2648,6 @@ class Texture extends js.Object {
   override def clone(): Texture = js.native
   def update(): Unit = js.native
   def dispose(): Unit = js.native
-  def addEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def hasEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def removeEventListener(`type`: String, listener: js.Function1[js.Any, Unit]): Unit = js.native
-  def dispatchEvent(event: js.Any): Unit = js.native
 }
 
 @js.native
