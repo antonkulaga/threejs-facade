@@ -4,7 +4,8 @@ jdk:
   - oraclejdk8
 
 scala:
-  - 2.11.6
+  - 2.11.8
+  - 2.12.1
 
 sudo: false
 
@@ -12,6 +13,14 @@ cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
+
+# Scala-JS 0.6.13 and later uses NodeJS for scala-js testing
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - npm install
+  - npm install jsdom
 
 script:
   # Your normal script
