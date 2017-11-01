@@ -1,14 +1,14 @@
 package org.denigma.threejs.extras
 
-import org.denigma.threejs.{ Vector3, Camera }
+import org.denigma.threejs.{Camera, Vector3}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSName
+import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
-@JSName("THREE.OrbitControls")
+@JSGlobal("THREE.OrbitControls")
 class OrbitControls(camera: Camera, element: HTMLElement) extends js.Object {
 
   def this(camera: Camera) = this(camera, null) // scalastyle:ignore

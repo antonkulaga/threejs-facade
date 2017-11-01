@@ -1,13 +1,13 @@
 package org.denigma.threejs.extras
 
-import org.denigma.threejs.{ Vector3, Vector2, Camera }
+import org.denigma.threejs.{Camera, Vector2, Vector3}
 import org.scalajs.dom
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSName
+import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
-@JSName("THREE.TrackballControls")
+@JSGlobal("THREE.TrackballControls")
 class TrackBallControls(camera: Camera) extends js.Object {
 
   def getMouseOnScreen(clientX: Double, clientY: Double): Vector2 = js.native

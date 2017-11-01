@@ -34,9 +34,9 @@ lazy val sharedJS = shared.js
 lazy val frontend = project.in(file("preview/frontend"))
 	.settings(commonSettings: _*)
 	.settings(
-	persistLauncher in Compile := true,
-	persistLauncher in Test := false,
-	jsDependencies += RuntimeDOM % "test",
+	scalaJSUseMainModuleInitializer in Compile := true,
+	scalaJSUseMainModuleInitializer in Test := false,
+	jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv,
 	testFrameworks += new TestFramework("utest.runner.Framework"),
 	libraryDependencies ++= Dependencies.sjsLibs.value++Dependencies.templates.value
 ).enablePlugins(ScalaJSPlugin, ScalaJSWeb).dependsOn(sharedJS,facade).disablePlugins(RevolverPlugin)
@@ -68,7 +68,7 @@ lazy val noPublishSettings = Seq(
 //settings for all the projects
 lazy val commonSettings = Seq(
 	scalaVersion := Versions.scala,
-    crossScalaVersions := Seq("2.11.8", "2.12.1"),
+    crossScalaVersions := Seq("2.11.11", "2.12.4"),
 	organization := "org.denigma",
 	resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"), //for scala-js-binding
 	libraryDependencies ++= Dependencies.commonShared.value++Dependencies.testing.value,
