@@ -10,7 +10,7 @@ Usage
 =====
 
 In order to resolve a lib you should add a resolver::
-```scala
+```sbtshell
 resolvers += sbt.Resolver.bintrayRepo("scalajs-facades", "scalajs-facades-releases") //add resolver
 libraryDependencies += "org.scalajs" %%% "threejs-facade" % "0.0.88-0.1.9" //add dependency
 ```
