@@ -1,8 +1,10 @@
-threejs facade
+three.js facade
 ==============
 
-This is a ScalaJS facade of ThreeJS javascript 3D library (http://threejs.org/). 
-All the code is inside facade folder (facade subproject). 
+[![Build Status](https://travis-ci.org/zikolach/threejs-facade.svg?branch=0.0.88-0.1.9)](https://travis-ci.org/zikolach/threejs-facade)
+
+This is a Scala.js facade of three.js javascript 3D library (http://threejs.org/). 
+All the code is inside facade folder (threejs subproject). 
 
 Usage
 =====
