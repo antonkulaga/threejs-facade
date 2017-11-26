@@ -2,6 +2,7 @@ package org.scalajs.treejs.preview
 
 import org.scalajs.dom.{document, window}
 import org.scalajs.threejs._
+import org.scalajs.threejs.extras.OrbitControls
 
 object PreviewApp {
   def main(args: Array[String]): Unit = {
@@ -23,7 +24,6 @@ object PreviewApp {
     material.vertexColors = THREE.FaceColors
     material.overdraw = 0.5
     val cube = new Mesh(geometry, material)
-    cube.position.y = 150
     scene.add(cube)
     var renderer = new WebGLRenderer()
     renderer.devicePixelRatio = window.devicePixelRatio
@@ -38,9 +38,11 @@ object PreviewApp {
       renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
+    new OrbitControls(camera, document.body)
+
     () => {
-      scene.children.head.rotation.y += 0.05
-      scene.children.head.rotation.x += 0.01
+      scene.children.head.rotation.y += 0.02
+      scene.children.head.rotation.x += 0.005
       renderer.render(scene, camera)
     }
   }

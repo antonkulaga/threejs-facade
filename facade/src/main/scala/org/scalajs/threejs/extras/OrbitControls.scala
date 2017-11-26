@@ -1,8 +1,8 @@
 package org.scalajs.threejs.extras
 
-import org.scalajs.threejs.{Camera, Vector3}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.threejs.{Camera, Vector3}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
@@ -10,8 +10,7 @@ import scala.scalajs.js.annotation.JSGlobal
 @js.native
 @JSGlobal("THREE.OrbitControls")
 class OrbitControls(camera: Camera, element: HTMLElement) extends js.Object {
-
-  def this(camera: Camera) = this(camera, null) // scalastyle:ignore
+  def this(camera: Camera) = this(camera, null)
 
   def rotateLeft(angle: Double): Unit = js.native
 
@@ -44,5 +43,4 @@ class OrbitControls(camera: Camera, element: HTMLElement) extends js.Object {
   def onKeyDown(event: dom.KeyboardEvent): Unit = js.native
 
   def onKeyUp(event: dom.KeyboardEvent): Unit = js.native
-
 }
