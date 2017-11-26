@@ -12,7 +12,7 @@ Usage
 In order to resolve a lib you should add a resolver::
 ```scala
 resolvers += sbt.Resolver.bintrayRepo("scalajs-facades", "scalajs-facades-releases") //add resolver
-libraryDependencies += "org.scalajs" %%% "threejs-facade" % "0.0.77-0.1.8" //add dependency
+libraryDependencies += "org.scalajs" %%% "threejs-facade" % "0.0.88-0.1.9" //add dependency
 ```
 
 Gettings started
