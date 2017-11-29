@@ -2960,8 +2960,8 @@ class ArrowHelper(dir: Vector3, origin: Vector3 = js.native, length: Double = js
 }
 
 @js.native
-@JSGlobal("THREE.AxisHelper")
-class AxisHelper(size: Double = js.native) extends Line
+@JSGlobal("THREE.AxesHelper")
+class AxesHelper(size: Double = js.native) extends Line
 
 @js.native
 @JSGlobal("THREE.BoundingBoxHelper")

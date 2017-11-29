@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.THREE = {})));
+	(factory((global.THREE = global.THREE || {})));
 }(this, (function (exports) { 'use strict';
 
 	// Polyfills
@@ -64,6 +64,8 @@
 		( function () {
 
 			Object.assign = function ( target ) {
+
+				'use strict';
 
 				if ( target === undefined || target === null ) {
 
@@ -185,7 +187,7 @@
 
 	} );
 
-	var REVISION = '89dev';
+	var REVISION = '88';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -321,24 +323,44 @@
 		DEG2RAD: Math.PI / 180,
 		RAD2DEG: 180 / Math.PI,
 
-		generateUUID: ( function () {
+		generateUUID: function () {
 
-			// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
+			// http://www.broofa.com/Tools/Math.uuid.htm
+			// Replaced .join with string concatenation (@takahirox)
 
-			var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16).toUpperCase(); }
+			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
+			var rnd = 0, r;
 
-			return function () {
-				var d0 = Math.random()*0xffffffff|0;
-				var d1 = Math.random()*0xffffffff|0;
-				var d2 = Math.random()*0xffffffff|0;
-				var d3 = Math.random()*0xffffffff|0;
-				return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
-					lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
-					lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
-					lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
-			}
+			return function generateUUID() {
 
-		} )(),
+				var uuid = '';
+
+				for ( var i = 0; i < 36; i ++ ) {
+
+					if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
+
+						uuid += '-';
+
+					} else if ( i === 14 ) {
+
+						uuid += '4';
+
+					} else {
+
+						if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
+						r = rnd & 0xf;
+						rnd = rnd >> 4;
+						uuid += chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
+
+					}
+
+				}
+
+				return uuid;
+
+			};
+
+		}(),
 
 		clamp: function ( value, min, max ) {
 
@@ -17488,14 +17510,14 @@
 	function getTexelDecodingFunction( functionName, encoding ) {
 
 		var components = getEncodingComponents( encoding );
-		return 'vec4 ' + functionName + '( vec4 value ) { return ' + components[ 0 ] + 'ToLinear' + components[ 1 ] + '; }';
+		return "vec4 " + functionName + "( vec4 value ) { return " + components[ 0 ] + "ToLinear" + components[ 1 ] + "; }";
 
 	}
 
 	function getTexelEncodingFunction( functionName, encoding ) {
 
 		var components = getEncodingComponents( encoding );
-		return 'vec4 ' + functionName + '( vec4 value ) { return LinearTo' + components[ 0 ] + components[ 1 ] + '; }';
+		return "vec4 " + functionName + "( vec4 value ) { return LinearTo" + components[ 0 ] + components[ 1 ] + "; }";
 
 	}
 
@@ -17506,19 +17528,19 @@
 		switch ( toneMapping ) {
 
 			case LinearToneMapping:
-				toneMappingName = 'Linear';
+				toneMappingName = "Linear";
 				break;
 
 			case ReinhardToneMapping:
-				toneMappingName = 'Reinhard';
+				toneMappingName = "Reinhard";
 				break;
 
 			case Uncharted2ToneMapping:
-				toneMappingName = 'Uncharted2';
+				toneMappingName = "Uncharted2";
 				break;
 
 			case CineonToneMapping:
-				toneMappingName = 'OptimizedCineon';
+				toneMappingName = "OptimizedCineon";
 				break;
 
 			default:
@@ -17526,7 +17548,7 @@
 
 		}
 
-		return 'vec3 ' + functionName + '( vec3 color ) { return ' + toneMappingName + 'ToneMapping( color ); }';
+		return "vec3 " + functionName + "( vec3 color ) { return " + toneMappingName + "ToneMapping( color ); }";
 
 	}
 
@@ -17919,9 +17941,9 @@
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
 
-				parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
+				parameters.premultipliedAlpha ? "#define PREMULTIPLIED_ALPHA" : '',
 
-				parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
+				parameters.physicallyCorrectLights ? "#define PHYSICALLY_CORRECT_LIGHTS" : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 				parameters.logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
@@ -17931,9 +17953,9 @@
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
 
-				( parameters.toneMapping !== NoToneMapping ) ? '#define TONE_MAPPING' : '',
+				( parameters.toneMapping !== NoToneMapping ) ? "#define TONE_MAPPING" : '',
 				( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '', // this code is required here because it is used by the toneMapping() function defined below
-				( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
+				( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
 				parameters.dithering ? '#define DITHERING' : '',
 
@@ -17941,9 +17963,9 @@
 				parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
 				parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
 				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
-				parameters.outputEncoding ? getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ) : '',
+				parameters.outputEncoding ? getTexelEncodingFunction( "linearToOutputTexel", parameters.outputEncoding ) : '',
 
-				parameters.depthPacking ? '#define DEPTH_PACKING ' + material.depthPacking : '',
+				parameters.depthPacking ? "#define DEPTH_PACKING " + material.depthPacking : '',
 
 				'\n'
 
@@ -20587,8 +20609,6 @@
 		var device = null;
 		var frameData = null;
 
-		var poseTarget = null;
-
 		if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
 			frameData = new window.VRFrameData();
@@ -20596,6 +20616,9 @@
 		}
 
 		var matrixWorldInverse = new Matrix4();
+
+		var standingMatrix = new Matrix4();
+		var standingMatrixInverse = new Matrix4();
 
 		var cameraL = new PerspectiveCamera();
 		cameraL.bounds = new Vector4( 0.0, 0.0, 0.5, 1.0 );
@@ -20643,6 +20666,7 @@
 		//
 
 		this.enabled = false;
+		this.standing = false;
 
 		this.getDevice = function () {
 
@@ -20653,12 +20677,6 @@
 		this.setDevice = function ( value ) {
 
 			if ( value !== undefined ) device = value;
-
-		};
-
-		this.setPoseTarget = function ( object ) {
-
-			if ( object !== undefined ) poseTarget = object;
 
 		};
 
@@ -20674,35 +20692,36 @@
 			//
 
 			var pose = frameData.pose;
-			var poseObject;
-
-			if ( poseTarget !== null ) {
-
-				poseObject = poseTarget;
-
-			} else {
-
-				poseObject = camera;
-
-			}
 
 			if ( pose.position !== null ) {
 
-				poseObject.position.fromArray( pose.position );
+				camera.position.fromArray( pose.position );
 
 			} else {
 
-				poseObject.position.set( 0, 0, 0 );
+				camera.position.set( 0, 0, 0 );
 
 			}
 
 			if ( pose.orientation !== null ) {
 
-				poseObject.quaternion.fromArray( pose.orientation );
+				camera.quaternion.fromArray( pose.orientation );
 
 			}
 
-			poseObject.updateMatrixWorld();
+			camera.updateMatrixWorld();
+
+			var stageParameters = device.stageParameters;
+
+			if ( this.standing && stageParameters ) {
+
+				standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+				standingMatrixInverse.getInverse( standingMatrix );
+
+				camera.matrixWorld.multiply( standingMatrix );
+				camera.matrixWorldInverse.multiply( standingMatrixInverse );
+
+			}
 
 			if ( device.isPresenting === false ) return camera;
 
@@ -20719,6 +20738,13 @@
 
 			cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 			cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
+
+			if ( this.standing && stageParameters ) {
+
+				cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
+				cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+
+			}
 
 			var parent = camera.parent;
 
@@ -20767,6 +20793,12 @@
 			}
 
 			return cameraVR;
+
+		};
+
+		this.getStandingMatrix = function () {
+
+			return standingMatrix;
 
 		};
 
@@ -22141,7 +22173,7 @@
 			if ( isAnimating ) return;
 
 			var device = vr.getDevice();
-
+			
 			if ( device && device.isPresenting ) {
 
 				device.requestAnimationFrame( loop );
@@ -22161,7 +22193,7 @@
 			if ( onAnimationFrame !== null ) onAnimationFrame( time );
 
 			var device = vr.getDevice();
-
+			
 			if ( device && device.isPresenting ) {
 
 				device.requestAnimationFrame( loop );
@@ -26561,815 +26593,6 @@
 	TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
 
 	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 * Port from https://github.com/mapbox/earcut (v2.1.2)
-	 */
-
-	var Earcut = {
-
-		triangulate: function ( data, holeIndices, dim ) {
-
-			dim = dim || 2;
-
-			var hasHoles = holeIndices && holeIndices.length,
-				outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length,
-				outerNode = linkedList( data, 0, outerLen, dim, true ),
-				triangles = [];
-
-			if ( ! outerNode ) return triangles;
-
-			var minX, minY, maxX, maxY, x, y, invSize;
-
-			if ( hasHoles ) outerNode = eliminateHoles( data, holeIndices, outerNode, dim );
-
-			// if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
-
-			if ( data.length > 80 * dim ) {
-
-				minX = maxX = data[ 0 ];
-				minY = maxY = data[ 1 ];
-
-				for ( var i = dim; i < outerLen; i += dim ) {
-
-					x = data[ i ];
-					y = data[ i + 1 ];
-					if ( x < minX ) minX = x;
-					if ( y < minY ) minY = y;
-					if ( x > maxX ) maxX = x;
-					if ( y > maxY ) maxY = y;
-
-				}
-
-				// minX, minY and invSize are later used to transform coords into integers for z-order calculation
-
-				invSize = Math.max( maxX - minX, maxY - minY );
-				invSize = invSize !== 0 ? 1 / invSize : 0;
-
-			}
-
-			earcutLinked( outerNode, triangles, dim, minX, minY, invSize );
-
-			return triangles;
-
-		}
-
-	};
-
-	// create a circular doubly linked list from polygon points in the specified winding order
-
-	function linkedList( data, start, end, dim, clockwise ) {
-
-		var i, last;
-
-		if ( clockwise === ( signedArea( data, start, end, dim ) > 0 ) ) {
-
-			for ( i = start; i < end; i += dim ) last = insertNode( i, data[ i ], data[ i + 1 ], last );
-
-		} else {
-
-			for ( i = end - dim; i >= start; i -= dim ) last = insertNode( i, data[ i ], data[ i + 1 ], last );
-
-		}
-
-		if ( last && equals( last, last.next ) ) {
-
-			removeNode( last );
-			last = last.next;
-
-		}
-
-		return last;
-
-	}
-
-	// eliminate colinear or duplicate points
-
-	function filterPoints( start, end ) {
-
-		if ( ! start ) return start;
-		if ( ! end ) end = start;
-
-		var p = start, again;
-
-		do {
-
-			again = false;
-
-			if ( ! p.steiner && ( equals( p, p.next ) || area( p.prev, p, p.next ) === 0 ) ) {
-
-				removeNode( p );
-				p = end = p.prev;
-				if ( p === p.next ) break;
-				again = true;
-
-			} else {
-
-				p = p.next;
-
-			}
-
-		} while ( again || p !== end );
-
-		return end;
-
-	}
-
-	// main ear slicing loop which triangulates a polygon (given as a linked list)
-
-	function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
-
-		if ( ! ear ) return;
-
-		// interlink polygon nodes in z-order
-
-		if ( ! pass && invSize ) indexCurve( ear, minX, minY, invSize );
-
-		var stop = ear, prev, next;
-
-		// iterate through ears, slicing them one by one
-
-		while ( ear.prev !== ear.next ) {
-
-			prev = ear.prev;
-			next = ear.next;
-
-			if ( invSize ? isEarHashed( ear, minX, minY, invSize ) : isEar( ear ) ) {
-
-				// cut off the triangle
-				triangles.push( prev.i / dim );
-				triangles.push( ear.i / dim );
-				triangles.push( next.i / dim );
-
-				removeNode( ear );
-
-				// skipping the next vertice leads to less sliver triangles
-				ear = next.next;
-				stop = next.next;
-
-				continue;
-
-			}
-
-			ear = next;
-
-			// if we looped through the whole remaining polygon and can't find any more ears
-
-			if ( ear === stop ) {
-
-				// try filtering points and slicing again
-
-				if ( ! pass ) {
-
-					earcutLinked( filterPoints( ear ), triangles, dim, minX, minY, invSize, 1 );
-
-					// if this didn't work, try curing all small self-intersections locally
-
-				} else if ( pass === 1 ) {
-
-					ear = cureLocalIntersections( ear, triangles, dim );
-					earcutLinked( ear, triangles, dim, minX, minY, invSize, 2 );
-
-				// as a last resort, try splitting the remaining polygon into two
-
-				} else if ( pass === 2 ) {
-
-					splitEarcut( ear, triangles, dim, minX, minY, invSize );
-
-				}
-
-				break;
-
-			}
-
-		}
-
-	}
-
-	// check whether a polygon node forms a valid ear with adjacent nodes
-
-	function isEar( ear ) {
-
-		var a = ear.prev,
-			b = ear,
-			c = ear.next;
-
-		if ( area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
-
-		// now make sure we don't have other points inside the potential ear
-		var p = ear.next.next;
-
-		while ( p !== ear.prev ) {
-
-			if ( pointInTriangle( a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y ) && area( p.prev, p, p.next ) >= 0 ) {
-
-				return false;
-
-			}
-
-			p = p.next;
-
-		}
-
-		return true;
-
-	}
-
-	function isEarHashed( ear, minX, minY, invSize ) {
-
-		var a = ear.prev,
-			b = ear,
-			c = ear.next;
-
-		if ( area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
-
-		// triangle bbox; min & max are calculated like this for speed
-
-		var minTX = a.x < b.x ? ( a.x < c.x ? a.x : c.x ) : ( b.x < c.x ? b.x : c.x ),
-			minTY = a.y < b.y ? ( a.y < c.y ? a.y : c.y ) : ( b.y < c.y ? b.y : c.y ),
-			maxTX = a.x > b.x ? ( a.x > c.x ? a.x : c.x ) : ( b.x > c.x ? b.x : c.x ),
-			maxTY = a.y > b.y ? ( a.y > c.y ? a.y : c.y ) : ( b.y > c.y ? b.y : c.y );
-
-		// z-order range for the current triangle bbox;
-
-		var minZ = zOrder( minTX, minTY, minX, minY, invSize ),
-			maxZ = zOrder( maxTX, maxTY, minX, minY, invSize );
-
-		// first look for points inside the triangle in increasing z-order
-
-		var p = ear.nextZ;
-
-		while ( p && p.z <= maxZ ) {
-
-			if ( p !== ear.prev && p !== ear.next &&
-					pointInTriangle( a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y ) &&
-					area( p.prev, p, p.next ) >= 0 ) return false;
-			p = p.nextZ;
-
-		}
-
-		// then look for points in decreasing z-order
-
-		p = ear.prevZ;
-
-		while ( p && p.z >= minZ ) {
-
-			if ( p !== ear.prev && p !== ear.next &&
-					pointInTriangle( a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y ) &&
-					area( p.prev, p, p.next ) >= 0 ) return false;
-
-			p = p.prevZ;
-
-		}
-
-		return true;
-
-	}
-
-	// go through all polygon nodes and cure small local self-intersections
-
-	function cureLocalIntersections( start, triangles, dim ) {
-
-		var p = start;
-
-		do {
-
-			var a = p.prev, b = p.next.next;
-
-			if ( ! equals( a, b ) && intersects( a, p, p.next, b ) && locallyInside( a, b ) && locallyInside( b, a ) ) {
-
-				triangles.push( a.i / dim );
-				triangles.push( p.i / dim );
-				triangles.push( b.i / dim );
-
-				// remove two nodes involved
-
-				removeNode( p );
-				removeNode( p.next );
-
-				p = start = b;
-
-			}
-
-			p = p.next;
-
-		} while ( p !== start );
-
-		return p;
-
-	}
-
-	// try splitting polygon into two and triangulate them independently
-
-	function splitEarcut( start, triangles, dim, minX, minY, invSize ) {
-
-		// look for a valid diagonal that divides the polygon into two
-
-		var a = start;
-
-		do {
-
-			var b = a.next.next;
-
-			while ( b !== a.prev ) {
-
-				if ( a.i !== b.i && isValidDiagonal( a, b ) ) {
-
-					// split the polygon in two by the diagonal
-
-					var c = splitPolygon( a, b );
-
-					// filter colinear points around the cuts
-
-					a = filterPoints( a, a.next );
-					c = filterPoints( c, c.next );
-
-					// run earcut on each half
-
-					earcutLinked( a, triangles, dim, minX, minY, invSize );
-					earcutLinked( c, triangles, dim, minX, minY, invSize );
-					return;
-
-				}
-
-				b = b.next;
-
-			}
-
-			a = a.next;
-
-		} while ( a !== start );
-
-	}
-
-	// link every hole into the outer loop, producing a single-ring polygon without holes
-
-	function eliminateHoles( data, holeIndices, outerNode, dim ) {
-
-		var queue = [], i, len, start, end, list;
-
-		for ( i = 0, len = holeIndices.length; i < len; i ++ ) {
-
-			start = holeIndices[ i ] * dim;
-			end = i < len - 1 ? holeIndices[ i + 1 ] * dim : data.length;
-			list = linkedList( data, start, end, dim, false );
-			if ( list === list.next ) list.steiner = true;
-			queue.push( getLeftmost( list ) );
-
-		}
-
-		queue.sort( compareX );
-
-		// process holes from left to right
-
-		for ( i = 0; i < queue.length; i ++ ) {
-
-			eliminateHole( queue[ i ], outerNode );
-			outerNode = filterPoints( outerNode, outerNode.next );
-
-		}
-
-		return outerNode;
-
-	}
-
-	function compareX( a, b ) {
-
-		return a.x - b.x;
-
-	}
-
-	// find a bridge between vertices that connects hole with an outer ring and and link it
-
-	function eliminateHole( hole, outerNode ) {
-
-		outerNode = findHoleBridge( hole, outerNode );
-
-		if ( outerNode ) {
-
-			var b = splitPolygon( outerNode, hole );
-
-			filterPoints( b, b.next );
-
-		}
-
-	}
-
-	// David Eberly's algorithm for finding a bridge between hole and outer polygon
-
-	function findHoleBridge( hole, outerNode ) {
-
-		var p = outerNode,
-			hx = hole.x,
-			hy = hole.y,
-			qx = - Infinity,
-			m;
-
-		// find a segment intersected by a ray from the hole's leftmost point to the left;
-		// segment's endpoint with lesser x will be potential connection point
-
-		do {
-
-			if ( hy <= p.y && hy >= p.next.y && p.next.y !== p.y ) {
-
-				var x = p.x + ( hy - p.y ) * ( p.next.x - p.x ) / ( p.next.y - p.y );
-
-				if ( x <= hx && x > qx ) {
-
-					qx = x;
-
-					if ( x === hx ) {
-
-						if ( hy === p.y ) return p;
-						if ( hy === p.next.y ) return p.next;
-
-					}
-
-					m = p.x < p.next.x ? p : p.next;
-
-				}
-
-			}
-
-			p = p.next;
-
-		} while ( p !== outerNode );
-
-		if ( ! m ) return null;
-
-		if ( hx === qx ) return m.prev; // hole touches outer segment; pick lower endpoint
-
-		// look for points inside the triangle of hole point, segment intersection and endpoint;
-		// if there are no points found, we have a valid connection;
-		// otherwise choose the point of the minimum angle with the ray as connection point
-
-		var stop = m,
-			mx = m.x,
-			my = m.y,
-			tanMin = Infinity,
-			tan;
-
-		p = m.next;
-
-		while ( p !== stop ) {
-
-			if ( hx >= p.x && p.x >= mx && hx !== p.x &&
-							pointInTriangle( hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y ) ) {
-
-				tan = Math.abs( hy - p.y ) / ( hx - p.x ); // tangential
-
-				if ( ( tan < tanMin || ( tan === tanMin && p.x > m.x ) ) && locallyInside( p, hole ) ) {
-
-					m = p;
-					tanMin = tan;
-
-				}
-
-			}
-
-			p = p.next;
-
-		}
-
-		return m;
-
-	}
-
-	// interlink polygon nodes in z-order
-
-	function indexCurve( start, minX, minY, invSize ) {
-
-		var p = start;
-
-		do {
-
-			if ( p.z === null ) p.z = zOrder( p.x, p.y, minX, minY, invSize );
-			p.prevZ = p.prev;
-			p.nextZ = p.next;
-			p = p.next;
-
-		} while ( p !== start );
-
-		p.prevZ.nextZ = null;
-		p.prevZ = null;
-
-		sortLinked( p );
-
-	}
-
-	// Simon Tatham's linked list merge sort algorithm
-	// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-
-	function sortLinked( list ) {
-
-		var i, p, q, e, tail, numMerges, pSize, qSize, inSize = 1;
-
-		do {
-
-			p = list;
-			list = null;
-			tail = null;
-			numMerges = 0;
-
-			while ( p ) {
-
-				numMerges ++;
-				q = p;
-				pSize = 0;
-
-				for ( i = 0; i < inSize; i ++ ) {
-
-					pSize ++;
-					q = q.nextZ;
-					if ( ! q ) break;
-
-				}
-
-				qSize = inSize;
-
-				while ( pSize > 0 || ( qSize > 0 && q ) ) {
-
-					if ( pSize !== 0 && ( qSize === 0 || ! q || p.z <= q.z ) ) {
-
-						e = p;
-						p = p.nextZ;
-						pSize --;
-
-					} else {
-
-						e = q;
-						q = q.nextZ;
-						qSize --;
-
-					}
-
-					if ( tail ) tail.nextZ = e;
-					else list = e;
-
-					e.prevZ = tail;
-					tail = e;
-
-				}
-
-				p = q;
-
-			}
-
-			tail.nextZ = null;
-			inSize *= 2;
-
-		} while ( numMerges > 1 );
-
-		return list;
-
-	}
-
-	// z-order of a point given coords and inverse of the longer side of data bbox
-
-	function zOrder( x, y, minX, minY, invSize ) {
-
-		// coords are transformed into non-negative 15-bit integer range
-
-		x = 32767 * ( x - minX ) * invSize;
-		y = 32767 * ( y - minY ) * invSize;
-
-		x = ( x | ( x << 8 ) ) & 0x00FF00FF;
-		x = ( x | ( x << 4 ) ) & 0x0F0F0F0F;
-		x = ( x | ( x << 2 ) ) & 0x33333333;
-		x = ( x | ( x << 1 ) ) & 0x55555555;
-
-		y = ( y | ( y << 8 ) ) & 0x00FF00FF;
-		y = ( y | ( y << 4 ) ) & 0x0F0F0F0F;
-		y = ( y | ( y << 2 ) ) & 0x33333333;
-		y = ( y | ( y << 1 ) ) & 0x55555555;
-
-		return x | ( y << 1 );
-
-	}
-
-	// find the leftmost node of a polygon ring
-
-	function getLeftmost( start ) {
-
-		var p = start, leftmost = start;
-
-		do {
-
-			if ( p.x < leftmost.x ) leftmost = p;
-			p = p.next;
-
-		} while ( p !== start );
-
-		return leftmost;
-
-	}
-
-	// check if a point lies within a convex triangle
-
-	function pointInTriangle( ax, ay, bx, by, cx, cy, px, py ) {
-
-		return ( cx - px ) * ( ay - py ) - ( ax - px ) * ( cy - py ) >= 0 &&
-		 ( ax - px ) * ( by - py ) - ( bx - px ) * ( ay - py ) >= 0 &&
-		 ( bx - px ) * ( cy - py ) - ( cx - px ) * ( by - py ) >= 0;
-
-	}
-
-	// check if a diagonal between two polygon nodes is valid (lies in polygon interior)
-
-	function isValidDiagonal( a, b ) {
-
-		return a.next.i !== b.i && a.prev.i !== b.i && ! intersectsPolygon( a, b ) &&
-			locallyInside( a, b ) && locallyInside( b, a ) && middleInside( a, b );
-
-	}
-
-	// signed area of a triangle
-
-	function area( p, q, r ) {
-
-		return ( q.y - p.y ) * ( r.x - q.x ) - ( q.x - p.x ) * ( r.y - q.y );
-
-	}
-
-	// check if two points are equal
-
-	function equals( p1, p2 ) {
-
-		return p1.x === p2.x && p1.y === p2.y;
-
-	}
-
-	// check if two segments intersect
-
-	function intersects( p1, q1, p2, q2 ) {
-
-		if ( ( equals( p1, q1 ) && equals( p2, q2 ) ) ||
-				( equals( p1, q2 ) && equals( p2, q1 ) ) ) return true;
-
-		return area( p1, q1, p2 ) > 0 !== area( p1, q1, q2 ) > 0 &&
-					 area( p2, q2, p1 ) > 0 !== area( p2, q2, q1 ) > 0;
-
-	}
-
-	// check if a polygon diagonal intersects any polygon segments
-
-	function intersectsPolygon( a, b ) {
-
-		var p = a;
-
-		do {
-
-			if ( p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&
-							intersects( p, p.next, a, b ) ) {
-
-				return true;
-
-			}
-
-			p = p.next;
-
-		} while ( p !== a );
-
-		return false;
-
-	}
-
-	// check if a polygon diagonal is locally inside the polygon
-
-	function locallyInside( a, b ) {
-
-		return area( a.prev, a, a.next ) < 0 ?
-			area( a, b, a.next ) >= 0 && area( a, a.prev, b ) >= 0 :
-			area( a, b, a.prev ) < 0 || area( a, a.next, b ) < 0;
-
-	}
-
-	// check if the middle point of a polygon diagonal is inside the polygon
-
-	function middleInside( a, b ) {
-
-		var p = a,
-			inside = false,
-			px = ( a.x + b.x ) / 2,
-			py = ( a.y + b.y ) / 2;
-
-		do {
-
-			if ( ( ( p.y > py ) !== ( p.next.y > py ) ) && p.next.y !== p.y &&
-							( px < ( p.next.x - p.x ) * ( py - p.y ) / ( p.next.y - p.y ) + p.x ) ) {
-
-				inside = ! inside;
-
-			}
-
-			p = p.next;
-
-		} while ( p !== a );
-
-		return inside;
-
-	}
-
-	// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;
-	// if one belongs to the outer ring and another to a hole, it merges it into a single ring
-
-	function splitPolygon( a, b ) {
-
-		var a2 = new Node( a.i, a.x, a.y ),
-			b2 = new Node( b.i, b.x, b.y ),
-			an = a.next,
-			bp = b.prev;
-
-		a.next = b;
-		b.prev = a;
-
-		a2.next = an;
-		an.prev = a2;
-
-		b2.next = a2;
-		a2.prev = b2;
-
-		bp.next = b2;
-		b2.prev = bp;
-
-		return b2;
-
-	}
-
-	// create a node and optionally link it with previous one (in a circular doubly linked list)
-
-	function insertNode( i, x, y, last ) {
-
-		var p = new Node( i, x, y );
-
-		if ( ! last ) {
-
-			p.prev = p;
-			p.next = p;
-
-		} else {
-
-			p.next = last.next;
-			p.prev = last;
-			last.next.prev = p;
-			last.next = p;
-
-		}
-
-		return p;
-
-	}
-
-	function removeNode( p ) {
-
-		p.next.prev = p.prev;
-		p.prev.next = p.next;
-
-		if ( p.prevZ ) p.prevZ.nextZ = p.nextZ;
-		if ( p.nextZ ) p.nextZ.prevZ = p.prevZ;
-
-	}
-
-	function Node( i, x, y ) {
-
-		// vertice index in coordinates array
-		this.i = i;
-
-		// vertex coordinates
-		this.x = x;
-		this.y = y;
-
-		// previous and next vertice nodes in a polygon ring
-		this.prev = null;
-		this.next = null;
-
-		// z-order curve value
-		this.z = null;
-
-		// previous and next nodes in z-order
-		this.prevZ = null;
-		this.nextZ = null;
-
-		// indicates whether this is a steiner point
-		this.steiner = false;
-
-	}
-
-	function signedArea( data, start, end, dim ) {
-
-		var sum = 0;
-
-		for ( var i = start, j = end - dim; i < end; i += dim ) {
-
-			sum += ( data[ j ] - data[ i ] ) * ( data[ i + 1 ] + data[ j + 1 ] );
-			j = i;
-
-		}
-
-		return sum;
-
-	}
-
-	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
 	 */
 
@@ -27392,11 +26615,173 @@
 
 		},
 
-		isClockWise: function ( pts ) {
+		triangulate: ( function () {
 
-			return ShapeUtils.area( pts ) < 0;
+			/**
+			 * This code is a quick port of code written in C++ which was submitted to
+			 * flipcode.com by John W. Ratcliff  // July 22, 2000
+			 * See original code and more information here:
+			 * http://www.flipcode.com/archives/Efficient_Polygon_Triangulation.shtml
+			 *
+			 * ported to actionscript by Zevan Rosser
+			 * www.actionsnippet.com
+			 *
+			 * ported to javascript by Joshua Koo
+			 * http://www.lab4games.net/zz85/blog
+			 *
+			 */
 
-		},
+			function snip( contour, u, v, w, n, verts ) {
+
+				var p;
+				var ax, ay, bx, by;
+				var cx, cy, px, py;
+
+				ax = contour[ verts[ u ] ].x;
+				ay = contour[ verts[ u ] ].y;
+
+				bx = contour[ verts[ v ] ].x;
+				by = contour[ verts[ v ] ].y;
+
+				cx = contour[ verts[ w ] ].x;
+				cy = contour[ verts[ w ] ].y;
+
+				if ( ( bx - ax ) * ( cy - ay ) - ( by - ay ) * ( cx - ax ) <= 0 ) return false;
+
+				var aX, aY, bX, bY, cX, cY;
+				var apx, apy, bpx, bpy, cpx, cpy;
+				var cCROSSap, bCROSScp, aCROSSbp;
+
+				aX = cx - bx; aY = cy - by;
+				bX = ax - cx; bY = ay - cy;
+				cX = bx - ax; cY = by - ay;
+
+				for ( p = 0; p < n; p ++ ) {
+
+					px = contour[ verts[ p ] ].x;
+					py = contour[ verts[ p ] ].y;
+
+					if ( ( ( px === ax ) && ( py === ay ) ) ||
+						 ( ( px === bx ) && ( py === by ) ) ||
+						 ( ( px === cx ) && ( py === cy ) ) )	continue;
+
+					apx = px - ax; apy = py - ay;
+					bpx = px - bx; bpy = py - by;
+					cpx = px - cx; cpy = py - cy;
+
+					// see if p is inside triangle abc
+
+					aCROSSbp = aX * bpy - aY * bpx;
+					cCROSSap = cX * apy - cY * apx;
+					bCROSScp = bX * cpy - bY * cpx;
+
+					if ( ( aCROSSbp >= - Number.EPSILON ) && ( bCROSScp >= - Number.EPSILON ) && ( cCROSSap >= - Number.EPSILON ) ) return false;
+
+				}
+
+				return true;
+
+			}
+
+			// takes in an contour array and returns
+
+			return function triangulate( contour, indices ) {
+
+				var n = contour.length;
+
+				if ( n < 3 ) return null;
+
+				var result = [],
+					verts = [],
+					vertIndices = [];
+
+				/* we want a counter-clockwise polygon in verts */
+
+				var u, v, w;
+
+				if ( ShapeUtils.area( contour ) > 0.0 ) {
+
+					for ( v = 0; v < n; v ++ ) verts[ v ] = v;
+
+				} else {
+
+					for ( v = 0; v < n; v ++ ) verts[ v ] = ( n - 1 ) - v;
+
+				}
+
+				var nv = n;
+
+				/*  remove nv - 2 vertices, creating 1 triangle every time */
+
+				var count = 2 * nv; /* error detection */
+
+				for ( v = nv - 1; nv > 2; ) {
+
+					/* if we loop, it is probably a non-simple polygon */
+
+					if ( ( count -- ) <= 0 ) {
+
+						//** Triangulate: ERROR - probable bad polygon!
+
+						//throw ( "Warning, unable to triangulate polygon!" );
+						//return null;
+						// Sometimes warning is fine, especially polygons are triangulated in reverse.
+						console.warn( 'THREE.ShapeUtils: Unable to triangulate polygon! in triangulate()' );
+
+						if ( indices ) return vertIndices;
+						return result;
+
+					}
+
+					/* three consecutive vertices in current polygon, <u,v,w> */
+
+					u = v; if ( nv <= u ) u = 0; /* previous */
+					v = u + 1; if ( nv <= v ) v = 0; /* new v    */
+					w = v + 1; if ( nv <= w ) w = 0; /* next     */
+
+					if ( snip( contour, u, v, w, nv, verts ) ) {
+
+						var a, b, c, s, t;
+
+						/* true names of the vertices */
+
+						a = verts[ u ];
+						b = verts[ v ];
+						c = verts[ w ];
+
+						/* output Triangle */
+
+						result.push( [ contour[ a ],
+							contour[ b ],
+							contour[ c ] ] );
+
+
+						vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
+
+						/* remove v from the remaining polygon */
+
+						for ( s = v, t = v + 1; t < nv; s ++, t ++ ) {
+
+							verts[ s ] = verts[ t ];
+
+						}
+
+						nv --;
+
+						/* reset error detection counter */
+
+						count = 2 * nv;
+
+					}
+
+				}
+
+				if ( indices ) return vertIndices;
+				return result;
+
+			};
+
+		} )(),
 
 		triangulateShape: function ( contour, holes ) {
 
@@ -27412,50 +26797,488 @@
 
 			}
 
-			function addContour( vertices, contour ) {
+			removeDupEndPts( contour );
+			holes.forEach( removeDupEndPts );
 
-				for ( var i = 0; i < contour.length; i ++ ) {
+			function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
 
-					vertices.push( contour[ i ].x );
-					vertices.push( contour[ i ].y );
+				// inOtherPt needs to be collinear to the inSegment
+				if ( inSegPt1.x !== inSegPt2.x ) {
+
+					if ( inSegPt1.x < inSegPt2.x ) {
+
+						return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
+
+					} else {
+
+						return	( ( inSegPt2.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt1.x ) );
+
+					}
+
+				} else {
+
+					if ( inSegPt1.y < inSegPt2.y ) {
+
+						return	( ( inSegPt1.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt2.y ) );
+
+					} else {
+
+						return	( ( inSegPt2.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt1.y ) );
+
+					}
 
 				}
 
 			}
 
-			var vertices = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
-			var holeIndices = []; // array of hole indices
-			var faces = []; // final array of vertex indices like [ [ a,b,d ], [ b,c,d ] ]
+			function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
 
-			removeDupEndPts( contour );
-			addContour( vertices, contour );
+				var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x, seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
+				var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x, seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
 
-			//
+				var seg1seg2dx = inSeg1Pt1.x - inSeg2Pt1.x;
+				var seg1seg2dy = inSeg1Pt1.y - inSeg2Pt1.y;
 
-			var holeIndex = contour.length;
-			holes.forEach( removeDupEndPts );
+				var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
+				var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
 
-			for ( i = 0; i < holes.length; i ++ ) {
+				if ( Math.abs( limit ) > Number.EPSILON ) {
 
-				holeIndices.push( holeIndex );
-				holeIndex += holes[ i ].length;
-				addContour( vertices, holes[ i ] );
+					// not parallel
+
+					var perpSeg2;
+					if ( limit > 0 ) {
+
+						if ( ( perpSeg1 < 0 ) || ( perpSeg1 > limit ) ) 		return [];
+						perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
+						if ( ( perpSeg2 < 0 ) || ( perpSeg2 > limit ) ) 		return [];
+
+					} else {
+
+						if ( ( perpSeg1 > 0 ) || ( perpSeg1 < limit ) ) 		return [];
+						perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
+						if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
+
+					}
+
+					// i.e. to reduce rounding errors
+					// intersection at endpoint of segment#1?
+					if ( perpSeg2 === 0 ) {
+
+						if ( ( inExcludeAdjacentSegs ) &&
+							 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+						return [ inSeg1Pt1 ];
+
+					}
+					if ( perpSeg2 === limit ) {
+
+						if ( ( inExcludeAdjacentSegs ) &&
+							 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+						return [ inSeg1Pt2 ];
+
+					}
+					// intersection at endpoint of segment#2?
+					if ( perpSeg1 === 0 )		return [ inSeg2Pt1 ];
+					if ( perpSeg1 === limit )	return [ inSeg2Pt2 ];
+
+					// return real intersection point
+					var factorSeg1 = perpSeg2 / limit;
+					return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx, y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
+
+				} else {
+
+					// parallel or collinear
+					if ( ( perpSeg1 !== 0 ) ||
+						 ( seg2dy * seg1seg2dx !== seg2dx * seg1seg2dy ) ) 			return [];
+
+					// they are collinear or degenerate
+					var seg1Pt = ( ( seg1dx === 0 ) && ( seg1dy === 0 ) );	// segment1 is just a point?
+					var seg2Pt = ( ( seg2dx === 0 ) && ( seg2dy === 0 ) );	// segment2 is just a point?
+					// both segments are points
+					if ( seg1Pt && seg2Pt ) {
+
+						if ( ( inSeg1Pt1.x !== inSeg2Pt1.x ) ||
+							 ( inSeg1Pt1.y !== inSeg2Pt1.y ) )		return [];	// they are distinct  points
+						return [ inSeg1Pt1 ];	// they are the same point
+
+					}
+					// segment#1  is a single point
+					if ( seg1Pt ) {
+
+						if ( ! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
+						return [ inSeg1Pt1 ];
+
+					}
+					// segment#2  is a single point
+					if ( seg2Pt ) {
+
+						if ( ! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
+						return [ inSeg2Pt1 ];
+
+					}
+
+					// they are collinear segments, which might overlap
+					var seg1min, seg1max, seg1minVal, seg1maxVal;
+					var seg2min, seg2max, seg2minVal, seg2maxVal;
+					if ( seg1dx !== 0 ) {
+
+						// the segments are NOT on a vertical line
+						if ( inSeg1Pt1.x < inSeg1Pt2.x ) {
+
+							seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.x;
+							seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.x;
+
+						} else {
+
+							seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.x;
+							seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.x;
+
+						}
+						if ( inSeg2Pt1.x < inSeg2Pt2.x ) {
+
+							seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.x;
+							seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.x;
+
+						} else {
+
+							seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.x;
+							seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.x;
+
+						}
+
+					} else {
+
+						// the segments are on a vertical line
+						if ( inSeg1Pt1.y < inSeg1Pt2.y ) {
+
+							seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.y;
+							seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.y;
+
+						} else {
+
+							seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.y;
+							seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.y;
+
+						}
+						if ( inSeg2Pt1.y < inSeg2Pt2.y ) {
+
+							seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.y;
+							seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.y;
+
+						} else {
+
+							seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.y;
+							seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.y;
+
+						}
+
+					}
+					if ( seg1minVal <= seg2minVal ) {
+
+						if ( seg1maxVal < seg2minVal )	return [];
+						if ( seg1maxVal === seg2minVal )	{
+
+							if ( inExcludeAdjacentSegs )		return [];
+							return [ seg2min ];
+
+						}
+						if ( seg1maxVal <= seg2maxVal )	return [ seg2min, seg1max ];
+						return	[ seg2min, seg2max ];
+
+					} else {
+
+						if ( seg1minVal > seg2maxVal )	return [];
+						if ( seg1minVal === seg2maxVal )	{
+
+							if ( inExcludeAdjacentSegs )		return [];
+							return [ seg1min ];
+
+						}
+						if ( seg1maxVal <= seg2maxVal )	return [ seg1min, seg1max ];
+						return	[ seg1min, seg2max ];
+
+					}
+
+				}
 
 			}
 
-			//
+			function isPointInsideAngle( inVertex, inLegFromPt, inLegToPt, inOtherPt ) {
 
-			var triangles = Earcut.triangulate( vertices, holeIndices );
+				// The order of legs is important
 
-			//
+				// translation of all points, so that Vertex is at (0,0)
+				var legFromPtX	= inLegFromPt.x - inVertex.x, legFromPtY = inLegFromPt.y - inVertex.y;
+				var legToPtX	= inLegToPt.x	- inVertex.x, legToPtY = inLegToPt.y	- inVertex.y;
+				var otherPtX	= inOtherPt.x	- inVertex.x, otherPtY = inOtherPt.y	- inVertex.y;
 
-			for ( var i = 0; i < triangles.length; i += 3 ) {
+				// main angle >0: < 180 deg.; 0: 180 deg.; <0: > 180 deg.
+				var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
+				var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
 
-				faces.push( triangles.slice( i, i + 3 ) );
+				if ( Math.abs( from2toAngle ) > Number.EPSILON ) {
+
+					// angle != 180 deg.
+
+					var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
+					// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
+
+					if ( from2toAngle > 0 ) {
+
+						// main angle < 180 deg.
+						return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
+
+					} else {
+
+						// main angle > 180 deg.
+						return	( ( from2otherAngle >= 0 ) || ( other2toAngle >= 0 ) );
+
+					}
+
+				} else {
+
+					// angle == 180 deg.
+					// console.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
+					return	( from2otherAngle > 0 );
+
+				}
 
 			}
 
-			return faces;
+
+			function removeHoles( contour, holes ) {
+
+				var shape = contour.concat(); // work on this shape
+				var hole;
+
+				function isCutLineInsideAngles( inShapeIdx, inHoleIdx ) {
+
+					// Check if hole point lies within angle around shape point
+					var lastShapeIdx = shape.length - 1;
+
+					var prevShapeIdx = inShapeIdx - 1;
+					if ( prevShapeIdx < 0 )			prevShapeIdx = lastShapeIdx;
+
+					var nextShapeIdx = inShapeIdx + 1;
+					if ( nextShapeIdx > lastShapeIdx )	nextShapeIdx = 0;
+
+					var insideAngle = isPointInsideAngle( shape[ inShapeIdx ], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[ inHoleIdx ] );
+					if ( ! insideAngle ) {
+
+						// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
+						return	false;
+
+					}
+
+					// Check if shape point lies within angle around hole point
+					var lastHoleIdx = hole.length - 1;
+
+					var prevHoleIdx = inHoleIdx - 1;
+					if ( prevHoleIdx < 0 )			prevHoleIdx = lastHoleIdx;
+
+					var nextHoleIdx = inHoleIdx + 1;
+					if ( nextHoleIdx > lastHoleIdx )	nextHoleIdx = 0;
+
+					insideAngle = isPointInsideAngle( hole[ inHoleIdx ], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[ inShapeIdx ] );
+					if ( ! insideAngle ) {
+
+						// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
+						return	false;
+
+					}
+
+					return	true;
+
+				}
+
+				function intersectsShapeEdge( inShapePt, inHolePt ) {
+
+					// checks for intersections with shape edges
+					var sIdx, nextIdx, intersection;
+					for ( sIdx = 0; sIdx < shape.length; sIdx ++ ) {
+
+						nextIdx = sIdx + 1; nextIdx %= shape.length;
+						intersection = intersect_segments_2D( inShapePt, inHolePt, shape[ sIdx ], shape[ nextIdx ], true );
+						if ( intersection.length > 0 )		return	true;
+
+					}
+
+					return	false;
+
+				}
+
+				var indepHoles = [];
+
+				function intersectsHoleEdge( inShapePt, inHolePt ) {
+
+					// checks for intersections with hole edges
+					var ihIdx, chkHole,
+						hIdx, nextIdx, intersection;
+					for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
+
+						chkHole = holes[ indepHoles[ ihIdx ] ];
+						for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
+
+							nextIdx = hIdx + 1; nextIdx %= chkHole.length;
+							intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[ hIdx ], chkHole[ nextIdx ], true );
+							if ( intersection.length > 0 )		return	true;
+
+						}
+
+					}
+					return	false;
+
+				}
+
+				var holeIndex, shapeIndex,
+					shapePt, holePt,
+					holeIdx, cutKey, failedCuts = [],
+					tmpShape1, tmpShape2,
+					tmpHole1, tmpHole2;
+
+				for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+					indepHoles.push( h );
+
+				}
+
+				var minShapeIndex = 0;
+				var counter = indepHoles.length * 2;
+				while ( indepHoles.length > 0 ) {
+
+					counter --;
+					if ( counter < 0 ) {
+
+						console.log( 'THREE.ShapeUtils: Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!' );
+						break;
+
+					}
+
+					// search for shape-vertex and hole-vertex,
+					// which can be connected without intersections
+					for ( shapeIndex = minShapeIndex; shapeIndex < shape.length; shapeIndex ++ ) {
+
+						shapePt = shape[ shapeIndex ];
+						holeIndex	= - 1;
+
+						// search for hole which can be reached without intersections
+						for ( var h = 0; h < indepHoles.length; h ++ ) {
+
+							holeIdx = indepHoles[ h ];
+
+							// prevent multiple checks
+							cutKey = shapePt.x + ':' + shapePt.y + ':' + holeIdx;
+							if ( failedCuts[ cutKey ] !== undefined )			continue;
+
+							hole = holes[ holeIdx ];
+							for ( var h2 = 0; h2 < hole.length; h2 ++ ) {
+
+								holePt = hole[ h2 ];
+								if ( ! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
+								if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
+								if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
+
+								holeIndex = h2;
+								indepHoles.splice( h, 1 );
+
+								tmpShape1 = shape.slice( 0, shapeIndex + 1 );
+								tmpShape2 = shape.slice( shapeIndex );
+								tmpHole1 = hole.slice( holeIndex );
+								tmpHole2 = hole.slice( 0, holeIndex + 1 );
+
+								shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
+
+								minShapeIndex = shapeIndex;
+
+								// Debug only, to show the selected cuts
+								// glob_CutLines.push( [ shapePt, holePt ] );
+
+								break;
+
+							}
+							if ( holeIndex >= 0 )	break;		// hole-vertex found
+
+							failedCuts[ cutKey ] = true;			// remember failure
+
+						}
+						if ( holeIndex >= 0 )	break;		// hole-vertex found
+
+					}
+
+				}
+
+				return shape; 			/* shape with no holes */
+
+			}
+
+
+			var i, il, f, face,
+				key, index,
+				allPointsMap = {};
+
+			// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
+
+			var allpoints = contour.concat();
+
+			for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+				Array.prototype.push.apply( allpoints, holes[ h ] );
+
+			}
+
+			//console.log( "allpoints",allpoints, allpoints.length );
+
+			// prepare all points map
+
+			for ( i = 0, il = allpoints.length; i < il; i ++ ) {
+
+				key = allpoints[ i ].x + ':' + allpoints[ i ].y;
+
+				if ( allPointsMap[ key ] !== undefined ) {
+
+					console.warn( 'THREE.ShapeUtils: Duplicate point', key, i );
+
+				}
+
+				allPointsMap[ key ] = i;
+
+			}
+
+			// remove holes by cutting paths to holes and adding them to the shape
+			var shapeWithoutHoles = removeHoles( contour, holes );
+
+			var triangles = ShapeUtils.triangulate( shapeWithoutHoles, false ); // True returns indices for points of spooled shape
+			//console.log( "triangles",triangles, triangles.length );
+
+			// check all face vertices against all points map
+
+			for ( i = 0, il = triangles.length; i < il; i ++ ) {
+
+				face = triangles[ i ];
+
+				for ( f = 0; f < 3; f ++ ) {
+
+					key = face[ f ].x + ':' + face[ f ].y;
+
+					index = allPointsMap[ key ];
+
+					if ( index !== undefined ) {
+
+						face[ f ] = index;
+
+					}
+
+				}
+
+			}
+
+			return triangles.concat();
+
+		},
+
+		isClockWise: function ( pts ) {
+
+			return ShapeUtils.area( pts ) < 0;
 
 		}
 
@@ -31193,15 +31016,12 @@
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var texture = new Texture();
-
 			var loader = new ImageLoader( this.manager );
 			loader.setCrossOrigin( this.crossOrigin );
 			loader.setPath( this.path );
 
-			loader.load( url, function ( image ) {
-
-				texture.image = image;
+			var texture = new Texture();
+			texture.image = loader.load( url, function () {
 
 				// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
 				var isJPEG = url.search( /\.(jpg|jpeg)$/ ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
@@ -31680,69 +31500,168 @@
 	} );
 
 	/**
-	 *
-	 * A Track that interpolates Strings
-	 *
-	 *
+	 * @author tschw
 	 * @author Ben Houston / http://clara.io/
 	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
 	 */
 
-	function StringKeyframeTrack( name, times, values, interpolation ) {
+	var AnimationUtils = {
 
-		KeyframeTrack.call( this, name, times, values, interpolation );
+		// same as Array.prototype.slice, but also works on typed arrays
+		arraySlice: function ( array, from, to ) {
 
-	}
+			if ( AnimationUtils.isTypedArray( array ) ) {
 
-	StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+				// in ios9 array.subarray(from, undefined) will return empty array
+				// but array.subarray(from) or array.subarray(from, len) is correct
+				return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
 
-		constructor: StringKeyframeTrack,
+			}
 
-		ValueTypeName: 'string',
-		ValueBufferType: Array,
+			return array.slice( from, to );
 
-		DefaultInterpolation: InterpolateDiscrete,
+		},
 
-		InterpolantFactoryMethodLinear: undefined,
+		// converts an array to a specific type
+		convertArray: function ( array, type, forceClone ) {
 
-		InterpolantFactoryMethodSmooth: undefined
+			if ( ! array || // let 'undefined' and 'null' pass
+					! forceClone && array.constructor === type ) return array;
 
-	} );
+			if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
 
-	/**
-	 *
-	 * A Track of Boolean keyframe values.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
+				return new type( array ); // create typed array
 
-	function BooleanKeyframeTrack( name, times, values ) {
+			}
 
-		KeyframeTrack.call( this, name, times, values );
+			return Array.prototype.slice.call( array ); // create Array
 
-	}
+		},
 
-	BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+		isTypedArray: function ( object ) {
 
-		constructor: BooleanKeyframeTrack,
+			return ArrayBuffer.isView( object ) &&
+					! ( object instanceof DataView );
 
-		ValueTypeName: 'bool',
-		ValueBufferType: Array,
+		},
 
-		DefaultInterpolation: InterpolateDiscrete,
+		// returns an array by which times and values can be sorted
+		getKeyframeOrder: function ( times ) {
 
-		InterpolantFactoryMethodLinear: undefined,
-		InterpolantFactoryMethodSmooth: undefined
+			function compareTime( i, j ) {
 
-		// Note: Actually this track could have a optimized / compressed
-		// representation of a single value and a custom interpolant that
-		// computes "firstValue ^ isOdd( index )".
+				return times[ i ] - times[ j ];
 
-	} );
+			}
+
+			var n = times.length;
+			var result = new Array( n );
+			for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
+
+			result.sort( compareTime );
+
+			return result;
+
+		},
+
+		// uses the array previously returned by 'getKeyframeOrder' to sort data
+		sortedArray: function ( values, stride, order ) {
+
+			var nValues = values.length;
+			var result = new values.constructor( nValues );
+
+			for ( var i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
+
+				var srcOffset = order[ i ] * stride;
+
+				for ( var j = 0; j !== stride; ++ j ) {
+
+					result[ dstOffset ++ ] = values[ srcOffset + j ];
+
+				}
+
+			}
+
+			return result;
+
+		},
+
+		// function for parsing AOS keyframe formats
+		flattenJSON: function ( jsonKeys, times, values, valuePropertyName ) {
+
+			var i = 1, key = jsonKeys[ 0 ];
+
+			while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
+
+				key = jsonKeys[ i ++ ];
+
+			}
+
+			if ( key === undefined ) return; // no data
+
+			var value = key[ valuePropertyName ];
+			if ( value === undefined ) return; // no data
+
+			if ( Array.isArray( value ) ) {
+
+				do {
+
+					value = key[ valuePropertyName ];
+
+					if ( value !== undefined ) {
+
+						times.push( key.time );
+						values.push.apply( values, value ); // push all elements
+
+					}
+
+					key = jsonKeys[ i ++ ];
+
+				} while ( key !== undefined );
+
+			} else if ( value.toArray !== undefined ) {
+
+				// ...assume THREE.Math-ish
+
+				do {
+
+					value = key[ valuePropertyName ];
+
+					if ( value !== undefined ) {
+
+						times.push( key.time );
+						value.toArray( values, values.length );
+
+					}
+
+					key = jsonKeys[ i ++ ];
+
+				} while ( key !== undefined );
+
+			} else {
+
+				// otherwise push as-is
+
+				do {
+
+					value = key[ valuePropertyName ];
+
+					if ( value !== undefined ) {
+
+						times.push( key.time );
+						values.push( value );
+
+					}
+
+					key = jsonKeys[ i ++ ];
+
+				} while ( key !== undefined );
+
+			}
+
+		}
+
+	};
 
 	/**
 	 * Abstract base class of interpolants over parametric samples.
@@ -32002,137 +31921,6 @@
 	} );
 
 	/**
-	 * Spherical linear unit quaternion interpolant.
-	 *
-	 * @author tschw
-	 */
-
-	function QuaternionLinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-
-		Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
-
-	}
-
-	QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
-
-		constructor: QuaternionLinearInterpolant,
-
-		interpolate_: function ( i1, t0, t, t1 ) {
-
-			var result = this.resultBuffer,
-				values = this.sampleValues,
-				stride = this.valueSize,
-
-				offset = i1 * stride,
-
-				alpha = ( t - t0 ) / ( t1 - t0 );
-
-			for ( var end = offset + stride; offset !== end; offset += 4 ) {
-
-				Quaternion.slerpFlat( result, 0, values, offset - stride, values, offset, alpha );
-
-			}
-
-			return result;
-
-		}
-
-	} );
-
-	/**
-	 *
-	 * A Track of quaternion keyframe values.
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
-
-	function QuaternionKeyframeTrack( name, times, values, interpolation ) {
-
-		KeyframeTrack.call( this, name, times, values, interpolation );
-
-	}
-
-	QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-		constructor: QuaternionKeyframeTrack,
-
-		ValueTypeName: 'quaternion',
-
-		// ValueBufferType is inherited
-
-		DefaultInterpolation: InterpolateLinear,
-
-		InterpolantFactoryMethodLinear: function ( result ) {
-
-			return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
-
-		},
-
-		InterpolantFactoryMethodSmooth: undefined // not yet implemented
-
-	} );
-
-	/**
-	 *
-	 * A Track of keyframe values that represent color.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
-
-	function ColorKeyframeTrack( name, times, values, interpolation ) {
-
-		KeyframeTrack.call( this, name, times, values, interpolation );
-
-	}
-
-	ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-		constructor: ColorKeyframeTrack,
-
-		ValueTypeName: 'color'
-
-		// ValueBufferType is inherited
-
-		// DefaultInterpolation is inherited
-
-		// Note: Very basic implementation and nothing special yet.
-		// However, this is the place for color space parameterization.
-
-	} );
-
-	/**
-	 *
-	 * A Track of numeric keyframe values.
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
-
-	function NumberKeyframeTrack( name, times, values, interpolation ) {
-
-		KeyframeTrack.call( this, name, times, values, interpolation );
-
-	}
-
-	NumberKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-		constructor: NumberKeyframeTrack,
-
-		ValueTypeName: 'number'
-
-		// ValueBufferType is inherited
-
-		// DefaultInterpolation is inherited
-
-	} );
-
-	/**
 	 * Fast and simple cubic spline interpolant.
 	 *
 	 * It was derived from a Hermitian construction setting the first derivative
@@ -32348,184 +32136,367 @@
 
 	} );
 
-	/**
-	 * @author tschw
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 */
+	var KeyframeTrackPrototype;
 
-	var AnimationUtils = {
+	KeyframeTrackPrototype = {
 
-		// same as Array.prototype.slice, but also works on typed arrays
-		arraySlice: function ( array, from, to ) {
+		TimeBufferType: Float32Array,
+		ValueBufferType: Float32Array,
 
-			if ( AnimationUtils.isTypedArray( array ) ) {
+		DefaultInterpolation: InterpolateLinear,
 
-				// in ios9 array.subarray(from, undefined) will return empty array
-				// but array.subarray(from) or array.subarray(from, len) is correct
-				return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
+		InterpolantFactoryMethodDiscrete: function ( result ) {
+
+			return new DiscreteInterpolant( this.times, this.values, this.getValueSize(), result );
+
+		},
+
+		InterpolantFactoryMethodLinear: function ( result ) {
+
+			return new LinearInterpolant( this.times, this.values, this.getValueSize(), result );
+
+		},
+
+		InterpolantFactoryMethodSmooth: function ( result ) {
+
+			return new CubicInterpolant( this.times, this.values, this.getValueSize(), result );
+
+		},
+
+		setInterpolation: function ( interpolation ) {
+
+			var factoryMethod;
+
+			switch ( interpolation ) {
+
+				case InterpolateDiscrete:
+
+					factoryMethod = this.InterpolantFactoryMethodDiscrete;
+
+					break;
+
+				case InterpolateLinear:
+
+					factoryMethod = this.InterpolantFactoryMethodLinear;
+
+					break;
+
+				case InterpolateSmooth:
+
+					factoryMethod = this.InterpolantFactoryMethodSmooth;
+
+					break;
 
 			}
 
-			return array.slice( from, to );
+			if ( factoryMethod === undefined ) {
 
-		},
+				var message = "unsupported interpolation for " +
+						this.ValueTypeName + " keyframe track named " + this.name;
 
-		// converts an array to a specific type
-		convertArray: function ( array, type, forceClone ) {
+				if ( this.createInterpolant === undefined ) {
 
-			if ( ! array || // let 'undefined' and 'null' pass
-					! forceClone && array.constructor === type ) return array;
+					// fall back to default, unless the default itself is messed up
+					if ( interpolation !== this.DefaultInterpolation ) {
 
-			if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+						this.setInterpolation( this.DefaultInterpolation );
 
-				return new type( array ); // create typed array
+					} else {
 
-			}
+						throw new Error( message ); // fatal, in this case
 
-			return Array.prototype.slice.call( array ); // create Array
+					}
 
-		},
+				}
 
-		isTypedArray: function ( object ) {
-
-			return ArrayBuffer.isView( object ) &&
-					! ( object instanceof DataView );
-
-		},
-
-		// returns an array by which times and values can be sorted
-		getKeyframeOrder: function ( times ) {
-
-			function compareTime( i, j ) {
-
-				return times[ i ] - times[ j ];
+				console.warn( 'THREE.KeyframeTrackPrototype:', message );
+				return;
 
 			}
 
-			var n = times.length;
-			var result = new Array( n );
-			for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
-
-			result.sort( compareTime );
-
-			return result;
+			this.createInterpolant = factoryMethod;
 
 		},
 
-		// uses the array previously returned by 'getKeyframeOrder' to sort data
-		sortedArray: function ( values, stride, order ) {
+		getInterpolation: function () {
 
-			var nValues = values.length;
-			var result = new values.constructor( nValues );
+			switch ( this.createInterpolant ) {
 
-			for ( var i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
+				case this.InterpolantFactoryMethodDiscrete:
 
-				var srcOffset = order[ i ] * stride;
+					return InterpolateDiscrete;
 
-				for ( var j = 0; j !== stride; ++ j ) {
+				case this.InterpolantFactoryMethodLinear:
 
-					result[ dstOffset ++ ] = values[ srcOffset + j ];
+					return InterpolateLinear;
+
+				case this.InterpolantFactoryMethodSmooth:
+
+					return InterpolateSmooth;
+
+			}
+
+		},
+
+		getValueSize: function () {
+
+			return this.values.length / this.times.length;
+
+		},
+
+		// move all keyframes either forwards or backwards in time
+		shift: function ( timeOffset ) {
+
+			if ( timeOffset !== 0.0 ) {
+
+				var times = this.times;
+
+				for ( var i = 0, n = times.length; i !== n; ++ i ) {
+
+					times[ i ] += timeOffset;
 
 				}
 
 			}
 
-			return result;
+			return this;
 
 		},
 
-		// function for parsing AOS keyframe formats
-		flattenJSON: function ( jsonKeys, times, values, valuePropertyName ) {
+		// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
+		scale: function ( timeScale ) {
 
-			var i = 1, key = jsonKeys[ 0 ];
+			if ( timeScale !== 1.0 ) {
 
-			while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
+				var times = this.times;
 
-				key = jsonKeys[ i ++ ];
+				for ( var i = 0, n = times.length; i !== n; ++ i ) {
+
+					times[ i ] *= timeScale;
+
+				}
+
+			}
+
+			return this;
+
+		},
+
+		// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
+		// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
+		trim: function ( startTime, endTime ) {
+
+			var times = this.times,
+				nKeys = times.length,
+				from = 0,
+				to = nKeys - 1;
+
+			while ( from !== nKeys && times[ from ] < startTime ) ++ from;
+			while ( to !== - 1 && times[ to ] > endTime ) -- to;
+
+			++ to; // inclusive -> exclusive bound
+
+			if ( from !== 0 || to !== nKeys ) {
+
+				// empty tracks are forbidden, so keep at least one keyframe
+				if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
+
+				var stride = this.getValueSize();
+				this.times = AnimationUtils.arraySlice( times, from, to );
+				this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
 
 			}
 
-			if ( key === undefined ) return; // no data
+			return this;
 
-			var value = key[ valuePropertyName ];
-			if ( value === undefined ) return; // no data
+		},
 
-			if ( Array.isArray( value ) ) {
+		// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
+		validate: function () {
 
-				do {
+			var valid = true;
 
-					value = key[ valuePropertyName ];
+			var valueSize = this.getValueSize();
+			if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-					if ( value !== undefined ) {
-
-						times.push( key.time );
-						values.push.apply( values, value ); // push all elements
-
-					}
-
-					key = jsonKeys[ i ++ ];
-
-				} while ( key !== undefined );
-
-			} else if ( value.toArray !== undefined ) {
-
-				// ...assume THREE.Math-ish
-
-				do {
-
-					value = key[ valuePropertyName ];
-
-					if ( value !== undefined ) {
-
-						times.push( key.time );
-						value.toArray( values, values.length );
-
-					}
-
-					key = jsonKeys[ i ++ ];
-
-				} while ( key !== undefined );
-
-			} else {
-
-				// otherwise push as-is
-
-				do {
-
-					value = key[ valuePropertyName ];
-
-					if ( value !== undefined ) {
-
-						times.push( key.time );
-						values.push( value );
-
-					}
-
-					key = jsonKeys[ i ++ ];
-
-				} while ( key !== undefined );
+				console.error( 'THREE.KeyframeTrackPrototype: Invalid value size in track.', this );
+				valid = false;
 
 			}
+
+			var times = this.times,
+				values = this.values,
+
+				nKeys = times.length;
+
+			if ( nKeys === 0 ) {
+
+				console.error( 'THREE.KeyframeTrackPrototype: Track is empty.', this );
+				valid = false;
+
+			}
+
+			var prevTime = null;
+
+			for ( var i = 0; i !== nKeys; i ++ ) {
+
+				var currTime = times[ i ];
+
+				if ( typeof currTime === 'number' && isNaN( currTime ) ) {
+
+					console.error( 'THREE.KeyframeTrackPrototype: Time is not a valid number.', this, i, currTime );
+					valid = false;
+					break;
+
+				}
+
+				if ( prevTime !== null && prevTime > currTime ) {
+
+					console.error( 'THREE.KeyframeTrackPrototype: Out of order keys.', this, i, currTime, prevTime );
+					valid = false;
+					break;
+
+				}
+
+				prevTime = currTime;
+
+			}
+
+			if ( values !== undefined ) {
+
+				if ( AnimationUtils.isTypedArray( values ) ) {
+
+					for ( var i = 0, n = values.length; i !== n; ++ i ) {
+
+						var value = values[ i ];
+
+						if ( isNaN( value ) ) {
+
+							console.error( 'THREE.KeyframeTrackPrototype: Value is not a valid number.', this, i, value );
+							valid = false;
+							break;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			return valid;
+
+		},
+
+		// removes equivalent sequential keys as common in morph target sequences
+		// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
+		optimize: function () {
+
+			var times = this.times,
+				values = this.values,
+				stride = this.getValueSize(),
+
+				smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
+
+				writeIndex = 1,
+				lastIndex = times.length - 1;
+
+			for ( var i = 1; i < lastIndex; ++ i ) {
+
+				var keep = false;
+
+				var time = times[ i ];
+				var timeNext = times[ i + 1 ];
+
+				// remove adjacent keyframes scheduled at the same time
+
+				if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
+
+					if ( ! smoothInterpolation ) {
+
+						// remove unnecessary keyframes same as their neighbors
+
+						var offset = i * stride,
+							offsetP = offset - stride,
+							offsetN = offset + stride;
+
+						for ( var j = 0; j !== stride; ++ j ) {
+
+							var value = values[ offset + j ];
+
+							if ( value !== values[ offsetP + j ] ||
+									value !== values[ offsetN + j ] ) {
+
+								keep = true;
+								break;
+
+							}
+
+						}
+
+					} else keep = true;
+
+				}
+
+				// in-place compaction
+
+				if ( keep ) {
+
+					if ( i !== writeIndex ) {
+
+						times[ writeIndex ] = times[ i ];
+
+						var readOffset = i * stride,
+							writeOffset = writeIndex * stride;
+
+						for ( var j = 0; j !== stride; ++ j )
+
+							values[ writeOffset + j ] = values[ readOffset + j ];
+
+					}
+
+					++ writeIndex;
+
+				}
+
+			}
+
+			// flush last keyframe (compaction looks ahead)
+
+			if ( lastIndex > 0 ) {
+
+				times[ writeIndex ] = times[ lastIndex ];
+
+				for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j )
+
+					values[ writeOffset + j ] = values[ readOffset + j ];
+
+				++ writeIndex;
+
+			}
+
+			if ( writeIndex !== times.length ) {
+
+				this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
+				this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
+
+			}
+
+			return this;
 
 		}
 
 	};
 
-	/**
-	 *
-	 * A timed sequence of keyframes for a specific property.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
+	function KeyframeTrackConstructor( name, times, values, interpolation ) {
 
-	function KeyframeTrack( name, times, values, interpolation ) {
+		if ( name === undefined ) throw new Error( 'track name is undefined' );
 
-		if ( name === undefined ) throw new Error( 'THREE.KeyframeTrack: track name is undefined' );
-		if ( times === undefined || times.length === 0 ) throw new Error( 'THREE.KeyframeTrack: no keyframes in track named ' + name );
+		if ( times === undefined || times.length === 0 ) {
+
+			throw new Error( 'no keyframes in track named ' + name );
+
+		}
 
 		this.name = name;
 
@@ -32539,6 +32510,250 @@
 
 	}
 
+	/**
+	 *
+	 * A Track of vectored keyframe values.
+	 *
+	 *
+	 * @author Ben Houston / http://clara.io/
+	 * @author David Sarno / http://lighthaus.us/
+	 * @author tschw
+	 */
+
+	function VectorKeyframeTrack( name, times, values, interpolation ) {
+
+		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+
+	}
+
+	VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
+
+		constructor: VectorKeyframeTrack,
+
+		ValueTypeName: 'vector'
+
+		// ValueBufferType is inherited
+
+		// DefaultInterpolation is inherited
+
+	} );
+
+	/**
+	 * Spherical linear unit quaternion interpolant.
+	 *
+	 * @author tschw
+	 */
+
+	function QuaternionLinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+		Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+	}
+
+	QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
+
+		constructor: QuaternionLinearInterpolant,
+
+		interpolate_: function ( i1, t0, t, t1 ) {
+
+			var result = this.resultBuffer,
+				values = this.sampleValues,
+				stride = this.valueSize,
+
+				offset = i1 * stride,
+
+				alpha = ( t - t0 ) / ( t1 - t0 );
+
+			for ( var end = offset + stride; offset !== end; offset += 4 ) {
+
+				Quaternion.slerpFlat( result, 0, values, offset - stride, values, offset, alpha );
+
+			}
+
+			return result;
+
+		}
+
+	} );
+
+	/**
+	 *
+	 * A Track of quaternion keyframe values.
+	 *
+	 * @author Ben Houston / http://clara.io/
+	 * @author David Sarno / http://lighthaus.us/
+	 * @author tschw
+	 */
+
+	function QuaternionKeyframeTrack( name, times, values, interpolation ) {
+
+		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+
+	}
+
+	QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
+
+		constructor: QuaternionKeyframeTrack,
+
+		ValueTypeName: 'quaternion',
+
+		// ValueBufferType is inherited
+
+		DefaultInterpolation: InterpolateLinear,
+
+		InterpolantFactoryMethodLinear: function ( result ) {
+
+			return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
+
+		},
+
+		InterpolantFactoryMethodSmooth: undefined // not yet implemented
+
+	} );
+
+	/**
+	 *
+	 * A Track of numeric keyframe values.
+	 *
+	 * @author Ben Houston / http://clara.io/
+	 * @author David Sarno / http://lighthaus.us/
+	 * @author tschw
+	 */
+
+	function NumberKeyframeTrack( name, times, values, interpolation ) {
+
+		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+
+	}
+
+	NumberKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
+
+		constructor: NumberKeyframeTrack,
+
+		ValueTypeName: 'number'
+
+		// ValueBufferType is inherited
+
+		// DefaultInterpolation is inherited
+
+	} );
+
+	/**
+	 *
+	 * A Track that interpolates Strings
+	 *
+	 *
+	 * @author Ben Houston / http://clara.io/
+	 * @author David Sarno / http://lighthaus.us/
+	 * @author tschw
+	 */
+
+	function StringKeyframeTrack( name, times, values, interpolation ) {
+
+		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+
+	}
+
+	StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
+
+		constructor: StringKeyframeTrack,
+
+		ValueTypeName: 'string',
+		ValueBufferType: Array,
+
+		DefaultInterpolation: InterpolateDiscrete,
+
+		InterpolantFactoryMethodLinear: undefined,
+
+		InterpolantFactoryMethodSmooth: undefined
+
+	} );
+
+	/**
+	 *
+	 * A Track of Boolean keyframe values.
+	 *
+	 *
+	 * @author Ben Houston / http://clara.io/
+	 * @author David Sarno / http://lighthaus.us/
+	 * @author tschw
+	 */
+
+	function BooleanKeyframeTrack( name, times, values ) {
+
+		KeyframeTrackConstructor.call( this, name, times, values );
+
+	}
+
+	BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
+
+		constructor: BooleanKeyframeTrack,
+
+		ValueTypeName: 'bool',
+		ValueBufferType: Array,
+
+		DefaultInterpolation: InterpolateDiscrete,
+
+		InterpolantFactoryMethodLinear: undefined,
+		InterpolantFactoryMethodSmooth: undefined
+
+		// Note: Actually this track could have a optimized / compressed
+		// representation of a single value and a custom interpolant that
+		// computes "firstValue ^ isOdd( index )".
+
+	} );
+
+	/**
+	 *
+	 * A Track of keyframe values that represent color.
+	 *
+	 *
+	 * @author Ben Houston / http://clara.io/
+	 * @author David Sarno / http://lighthaus.us/
+	 * @author tschw
+	 */
+
+	function ColorKeyframeTrack( name, times, values, interpolation ) {
+
+		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+
+	}
+
+	ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
+
+		constructor: ColorKeyframeTrack,
+
+		ValueTypeName: 'color'
+
+		// ValueBufferType is inherited
+
+		// DefaultInterpolation is inherited
+
+
+		// Note: Very basic implementation and nothing special yet.
+		// However, this is the place for color space parameterization.
+
+	} );
+
+	/**
+	 *
+	 * A timed sequence of keyframes for a specific property.
+	 *
+	 *
+	 * @author Ben Houston / http://clara.io/
+	 * @author David Sarno / http://lighthaus.us/
+	 * @author tschw
+	 */
+
+	function KeyframeTrack( name, times, values, interpolation ) {
+
+		KeyframeTrackConstructor.apply( this, name, times, values, interpolation );
+
+	}
+
+	KeyframeTrack.prototype = KeyframeTrackPrototype;
+	KeyframeTrackPrototype.constructor = KeyframeTrack;
+
 	// Static methods:
 
 	Object.assign( KeyframeTrack, {
@@ -32550,7 +32765,7 @@
 
 			if ( json.type === undefined ) {
 
-				throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+				throw new Error( 'track type undefined, can not parse' );
 
 			}
 
@@ -32657,407 +32872,9 @@
 
 			}
 
-			throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+			throw new Error( 'Unsupported typeName: ' + typeName );
 
 		}
-
-	} );
-
-	Object.assign( KeyframeTrack.prototype, {
-
-		constructor: KeyframeTrack,
-
-		TimeBufferType: Float32Array,
-
-		ValueBufferType: Float32Array,
-
-		DefaultInterpolation: InterpolateLinear,
-
-		InterpolantFactoryMethodDiscrete: function ( result ) {
-
-			return new DiscreteInterpolant( this.times, this.values, this.getValueSize(), result );
-
-		},
-
-		InterpolantFactoryMethodLinear: function ( result ) {
-
-			return new LinearInterpolant( this.times, this.values, this.getValueSize(), result );
-
-		},
-
-		InterpolantFactoryMethodSmooth: function ( result ) {
-
-			return new CubicInterpolant( this.times, this.values, this.getValueSize(), result );
-
-		},
-
-		setInterpolation: function ( interpolation ) {
-
-			var factoryMethod;
-
-			switch ( interpolation ) {
-
-				case InterpolateDiscrete:
-
-					factoryMethod = this.InterpolantFactoryMethodDiscrete;
-
-					break;
-
-				case InterpolateLinear:
-
-					factoryMethod = this.InterpolantFactoryMethodLinear;
-
-					break;
-
-				case InterpolateSmooth:
-
-					factoryMethod = this.InterpolantFactoryMethodSmooth;
-
-					break;
-
-			}
-
-			if ( factoryMethod === undefined ) {
-
-				var message = "unsupported interpolation for " +
-					this.ValueTypeName + " keyframe track named " + this.name;
-
-				if ( this.createInterpolant === undefined ) {
-
-					// fall back to default, unless the default itself is messed up
-					if ( interpolation !== this.DefaultInterpolation ) {
-
-						this.setInterpolation( this.DefaultInterpolation );
-
-					} else {
-
-						throw new Error( message ); // fatal, in this case
-
-					}
-
-				}
-
-				console.warn( 'THREE.KeyframeTrack:', message );
-				return;
-
-			}
-
-			this.createInterpolant = factoryMethod;
-
-		},
-
-		getInterpolation: function () {
-
-			switch ( this.createInterpolant ) {
-
-				case this.InterpolantFactoryMethodDiscrete:
-
-					return InterpolateDiscrete;
-
-				case this.InterpolantFactoryMethodLinear:
-
-					return InterpolateLinear;
-
-				case this.InterpolantFactoryMethodSmooth:
-
-					return InterpolateSmooth;
-
-			}
-
-		},
-
-		getValueSize: function () {
-
-			return this.values.length / this.times.length;
-
-		},
-
-		// move all keyframes either forwards or backwards in time
-		shift: function ( timeOffset ) {
-
-			if ( timeOffset !== 0.0 ) {
-
-				var times = this.times;
-
-				for ( var i = 0, n = times.length; i !== n; ++ i ) {
-
-					times[ i ] += timeOffset;
-
-				}
-
-			}
-
-			return this;
-
-		},
-
-		// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
-		scale: function ( timeScale ) {
-
-			if ( timeScale !== 1.0 ) {
-
-				var times = this.times;
-
-				for ( var i = 0, n = times.length; i !== n; ++ i ) {
-
-					times[ i ] *= timeScale;
-
-				}
-
-			}
-
-			return this;
-
-		},
-
-		// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
-		// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
-		trim: function ( startTime, endTime ) {
-
-			var times = this.times,
-				nKeys = times.length,
-				from = 0,
-				to = nKeys - 1;
-
-			while ( from !== nKeys && times[ from ] < startTime ) {
-
-				++ from;
-
-			}
-
-			while ( to !== - 1 && times[ to ] > endTime ) {
-
-				-- to;
-
-			}
-
-			++ to; // inclusive -> exclusive bound
-
-			if ( from !== 0 || to !== nKeys ) {
-
-				// empty tracks are forbidden, so keep at least one keyframe
-				if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
-
-				var stride = this.getValueSize();
-				this.times = AnimationUtils.arraySlice( times, from, to );
-				this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
-
-			}
-
-			return this;
-
-		},
-
-		// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-		validate: function () {
-
-			var valid = true;
-
-			var valueSize = this.getValueSize();
-			if ( valueSize - Math.floor( valueSize ) !== 0 ) {
-
-				console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
-				valid = false;
-
-			}
-
-			var times = this.times,
-				values = this.values,
-
-				nKeys = times.length;
-
-			if ( nKeys === 0 ) {
-
-				console.error( 'THREE.KeyframeTrack: Track is empty.', this );
-				valid = false;
-
-			}
-
-			var prevTime = null;
-
-			for ( var i = 0; i !== nKeys; i ++ ) {
-
-				var currTime = times[ i ];
-
-				if ( typeof currTime === 'number' && isNaN( currTime ) ) {
-
-					console.error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
-					valid = false;
-					break;
-
-				}
-
-				if ( prevTime !== null && prevTime > currTime ) {
-
-					console.error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
-					valid = false;
-					break;
-
-				}
-
-				prevTime = currTime;
-
-			}
-
-			if ( values !== undefined ) {
-
-				if ( AnimationUtils.isTypedArray( values ) ) {
-
-					for ( var i = 0, n = values.length; i !== n; ++ i ) {
-
-						var value = values[ i ];
-
-						if ( isNaN( value ) ) {
-
-							console.error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
-							valid = false;
-							break;
-
-						}
-
-					}
-
-				}
-
-			}
-
-			return valid;
-
-		},
-
-		// removes equivalent sequential keys as common in morph target sequences
-		// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
-		optimize: function () {
-
-			var times = this.times,
-				values = this.values,
-				stride = this.getValueSize(),
-
-				smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
-
-				writeIndex = 1,
-				lastIndex = times.length - 1;
-
-			for ( var i = 1; i < lastIndex; ++ i ) {
-
-				var keep = false;
-
-				var time = times[ i ];
-				var timeNext = times[ i + 1 ];
-
-				// remove adjacent keyframes scheduled at the same time
-
-				if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
-
-					if ( ! smoothInterpolation ) {
-
-						// remove unnecessary keyframes same as their neighbors
-
-						var offset = i * stride,
-							offsetP = offset - stride,
-							offsetN = offset + stride;
-
-						for ( var j = 0; j !== stride; ++ j ) {
-
-							var value = values[ offset + j ];
-
-							if ( value !== values[ offsetP + j ] ||
-								value !== values[ offsetN + j ] ) {
-
-								keep = true;
-								break;
-
-							}
-
-						}
-
-					} else {
-
-						keep = true;
-
-					}
-
-				}
-
-				// in-place compaction
-
-				if ( keep ) {
-
-					if ( i !== writeIndex ) {
-
-						times[ writeIndex ] = times[ i ];
-
-						var readOffset = i * stride,
-							writeOffset = writeIndex * stride;
-
-						for ( var j = 0; j !== stride; ++ j ) {
-
-							values[ writeOffset + j ] = values[ readOffset + j ];
-
-						}
-
-					}
-
-					++ writeIndex;
-
-				}
-
-			}
-
-			// flush last keyframe (compaction looks ahead)
-
-			if ( lastIndex > 0 ) {
-
-				times[ writeIndex ] = times[ lastIndex ];
-
-				for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j ) {
-
-					values[ writeOffset + j ] = values[ readOffset + j ];
-
-				}
-
-				++ writeIndex;
-
-			}
-
-			if ( writeIndex !== times.length ) {
-
-				this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
-				this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
-
-			}
-
-			return this;
-
-		}
-
-	} );
-
-	/**
-	 *
-	 * A Track of vectored keyframe values.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
-
-	function VectorKeyframeTrack( name, times, values, interpolation ) {
-
-		KeyframeTrack.call( this, name, times, values, interpolation );
-
-	}
-
-	VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-		constructor: VectorKeyframeTrack,
-
-		ValueTypeName: 'vector'
-
-		// ValueBufferType is inherited
-
-		// DefaultInterpolation is inherited
 
 	} );
 
@@ -35360,109 +35177,6 @@
 	};
 
 	/**
-	 * @author thespite / http://clicktorelease.com/
-	 */
-
-	function ImageBitmapLoader( manager ) {
-
-		if ( typeof createImageBitmap === 'undefined' ) {
-
-			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
-
-		}
-
-		if ( typeof fetch === 'undefined' ) {
-
-			console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
-
-		}
-
-		this.manager = manager !== undefined ? manager : DefaultLoadingManager;
-		this.options = undefined;
-
-	}
-
-	ImageBitmapLoader.prototype = {
-
-		constructor: ImageBitmapLoader,
-
-		setOptions: function setOptions( options ) {
-
-			this.options = options;
-
-			return this;
-
-		},
-
-		load: function load( url, onLoad, onProgress, onError ) {
-
-			if ( url === undefined ) url = '';
-
-			if ( this.path !== undefined ) url = this.path + url;
-
-			var scope = this;
-
-			var cached = Cache.get( url );
-
-			if ( cached !== undefined ) {
-
-				scope.manager.itemStart( url );
-
-				setTimeout( function () {
-
-					if ( onLoad ) onLoad( cached );
-
-					scope.manager.itemEnd( url );
-
-				}, 0 );
-
-				return cached;
-
-			}
-
-			fetch( url ).then( function ( res ) {
-
-				return res.blob();
-
-			} ).then( function ( blob ) {
-
-				return createImageBitmap( blob, scope.options );
-
-			} ).then( function ( imageBitmap ) {
-
-				Cache.add( url, imageBitmap );
-
-				if ( onLoad ) onLoad( imageBitmap );
-
-				scope.manager.itemEnd( url );
-
-			} ).catch( function ( e ) {
-
-				if ( onError ) onError( e );
-
-				scope.manager.itemEnd( url );
-				scope.manager.itemError( url );
-
-			} );
-
-		},
-
-		setCrossOrigin: function ( /* value */ ) {
-
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		}
-
-	};
-
-	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
 	 *
 	 * Bezier Curves formulas obtained from
@@ -36230,7 +35944,7 @@
 		this.xRadius = xRadius || 1;
 		this.yRadius = yRadius || 1;
 
-		this.aStartAngle = aStartAngle || 0;
+		this.aStartAngle = aStartAngle || 0;
 		this.aEndAngle = aEndAngle || 2 * Math.PI;
 
 		this.aClockwise = aClockwise || false;
@@ -36474,30 +36188,7 @@
 
 	};
 
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Creates free form 2d path using series of points, lines or curves.
-	 **/
-
-	function Path( points ) {
-
-		CurvePath.call( this );
-
-		this.type = 'Path';
-
-		this.currentPoint = new Vector2();
-
-		if ( points ) {
-
-			this.setFromPoints( points );
-
-		}
-
-	}
-
-	Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
-
-		constructor: Path,
+	var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 		setFromPoints: function ( points ) {
 
@@ -36629,6 +36320,30 @@
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 * Creates free form 2d path using series of points, lines or curves.
+	 **/
+
+	function Path( points ) {
+
+		CurvePath.call( this );
+
+		this.type = 'Path';
+
+		this.currentPoint = new Vector2();
+
+		if ( points ) {
+
+			this.setFromPoints( points );
+
+		}
+
+	}
+
+	Path.prototype = PathPrototype;
+	PathPrototype.constructor = Path;
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
 	 * Defines a 2d shape plane using paths.
 	 **/
 
@@ -36648,7 +36363,7 @@
 
 	}
 
-	Shape.prototype = Object.assign( Object.create( Path.prototype ), {
+	Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
 		constructor: Shape,
 
@@ -37083,7 +36798,13 @@
 									cpx0 = laste.x;
 									cpy0 = laste.y;
 
-									
+									for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
+
+										var t = i2 / divisions;
+										QuadraticBezier( t, cpx0, cpx1, cpx );
+										QuadraticBezier( t, cpy0, cpy1, cpy );
+
+									}
 
 								}
 
@@ -37107,7 +36828,13 @@
 									cpx0 = laste.x;
 									cpy0 = laste.y;
 
-									
+									for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
+
+										var t = i2 / divisions;
+										CubicBezier( t, cpx0, cpx1, cpx2, cpx );
+										CubicBezier( t, cpy0, cpy1, cpy2, cpy );
+
+									}
 
 								}
 
@@ -44796,30 +44523,6 @@
 
 	//
 
-	Object.assign( WebVRManager.prototype, {
-
-		getStandingMatrix: function () {
-
-			console.warn( 'THREE.WebVRManager: .getStandingMatrix() has been removed.' );
-
-		}
-
-	} );
-
-	Object.defineProperties( WebVRManager.prototype, {
-
-		standing: {
-			set: function ( value ) {
-
-				console.warn( 'THREE.WebVRManager: .standing has been removed.' );
-
-			}
-		}
-
-	} );
-
-	//
-
 	Audio.prototype.load = function ( file ) {
 
 		console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
@@ -45011,7 +44714,6 @@
 	exports.LoadingManager = LoadingManager;
 	exports.JSONLoader = JSONLoader;
 	exports.ImageLoader = ImageLoader;
-	exports.ImageBitmapLoader = ImageBitmapLoader;
 	exports.FontLoader = FontLoader;
 	exports.FileLoader = FileLoader;
 	exports.Loader = Loader;
