@@ -396,6 +396,7 @@ class BufferGeometry extends Geometry {
   def merge(): Unit = js.native
   def normalizeNormals(): Unit = js.native
   def reorderBuffers(indexBuffer: Double, indexMap: js.Array[Double], vertexCount: Double): Unit = js.native
+  def setIndex( index:js.Array[Int] ): Unit = js.native
   override def clone(): BufferGeometry = js.native
 }
 
@@ -2868,6 +2869,13 @@ class ParametricGeometry(func: js.Function2[Double, Double, Vector3], slices: Do
 @js.native
 @JSName("THREE.PlaneGeometry")
 class PlaneGeometry(var width: Double, var height: Double, var widthSegments: Double = js.native, var heightSegments: Double = js.native) extends Geometry {
+  var parameters: js.Any = js.native
+}
+
+@js.native
+@JSName("THREE.PlaneBufferGeometry")
+class PlaneBufferGeometry extends Geometry {
+  def this(width: Double, height: Double, widthSegments: Double = js.native, heightSegments: Double = js.native) = this()
   var parameters: js.Any = js.native
 }
 
